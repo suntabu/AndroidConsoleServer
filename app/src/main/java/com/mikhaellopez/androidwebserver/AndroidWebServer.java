@@ -26,6 +26,11 @@ public class AndroidWebServer extends NanoHTTPD {
         } else {
             msg += "<p>Hello, " + parms.get("username") + "!</p>";
         }
+
+
+
+
+
         return newFixedLengthResponse( msg + "</body></html>\n" );
     }
 }
