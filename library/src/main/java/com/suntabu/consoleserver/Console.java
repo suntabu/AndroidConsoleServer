@@ -8,6 +8,8 @@ package com.suntabu.consoleserver;
 import android.app.Activity;
 
 import java.lang.reflect.Field;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -34,16 +36,17 @@ public class Console {
         if (mCommandRecord.size() >= 10) {
             mCommandRecord.remove(0);
         }
+        command = URLDecoder.decode(command);
         mCommandRecord.add(command);
         String[] strings = command.split(" ");
-        Class clazz = Class.forName(strings[0]);
         for (Map.Entry<String, Activity> entry : ConsoleServer.clazzMap.entrySet()) {
             if (entry.getKey().contains(strings[0])) {
+                Class clazz = Class.forName(entry.getKey());
                 if (command.contains("-m")) {
                     java.lang.reflect.Method method = clazz.getDeclaredMethod(strings[1]);
 
                 } else if (command.contains("-f")) {
-                    Field field = clazz.getDeclaredField("string[1]");
+                    Field field = clazz.getDeclaredField(strings[1]);
                     field.setAccessible(true);
                     result = (String) field.get(entry.getValue());
                 }

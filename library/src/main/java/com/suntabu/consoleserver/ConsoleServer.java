@@ -33,18 +33,40 @@ public class ConsoleServer extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         try {
-            String uri = session.getUri();
+            Method method = session.getMethod();
+            String uri = session.getUri().toLowerCase();
+
+
             if (uri.contains("console.css")) {
                 return newFixedLengthResponse(Response.Status.OK, MIME_CSS, ConsoleContent.loadAssets("console_html/console.css"));
             } else if (uri.contains("favicon.icon")) {
 
             }
-            Map<String, String> params = session.getParms();
-                if (params.size() == 0) {
+
+            if (uri.contains("console/out")) {
+
+                return console.console_out(session);
+
+            } else if (uri.contains("console/run")) {
+
+                return console.console_run(session);
+
+            } else if (uri.contains("console/commandhistory")) {
+
+                return console.console_history(session);
+
+            } else if (uri.contains("console/complete")) {
+
+                return console.console_complete(session);
+
+            }
+
+
+            Map<String, String> parms = session.getParms();
+            if (parms.size() == 0) {
                 return newFixedLengthResponse(Response.Status.OK, MIME_HTML, ConsoleContent.loadAssets("console_html/index.html"));
             } else {
-                Console con = new Console();
-                con.console_run(session);
+
             }
 
 
