@@ -14,9 +14,10 @@ import java.io.InputStream;
 
 public class ConsoleContent {
 
+    private static final int MAX_CACHE = 100;
 
 
-    public static String LogContent = "hahahhaha";
+    public static String LogContent = "Happy Coding\n";
 
 
 

@@ -36,7 +36,7 @@ public class LogModule {
         String format = "\n [%s] : %s";
 
 
-        String content = String.format(format,new SimpleDateFormat("HH:mm:ss").format(new Date()),msg + " " );
+        String content = String.format(format,new SimpleDateFormat("HH:mm:ss:fff").format(new Date()),msg + " " );
 
         ConsoleContent.LogContent +=content;
 
