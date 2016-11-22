@@ -13,8 +13,10 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -28,9 +30,9 @@ import com.suntabu.consoleserver.ConsoleServer;
  * Created by Mikhael LOPEZ on 14/12/2015.
  */
 public class MainActivity extends AppCompatActivity {
-
+    public static MainActivity activity;
     private static final int DEFAULT_PORT = 8080;
-
+    private String temp = "测试反射";
     // INSTANCE OF ANDROID WEB SERVER
     private ConsoleServer androidWebServer;
     private BroadcastReceiver broadcastReceiverNetworkState;
@@ -49,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ACS.init(this);
 
+        activity = this;
+
+        Log.e("....", "onCreate:  " + this.getClass().getName());
+        ConsoleServer.clazzMap.put(getClass().getName(), this);
         // INIT VIEW
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         editTextPort = (EditText) findViewById(R.id.editTextPort);

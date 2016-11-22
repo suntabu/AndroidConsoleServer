@@ -1,7 +1,12 @@
 package com.suntabu.consoleserver;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.res.Resources;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import com.suntabu.log.SunLog;
 
 import java.util.Map;
@@ -42,11 +47,11 @@ public class ConsoleServer extends NanoHTTPD {
             }
 
             if (uri.contains("console/out")) {
-                SunLog.Log("refresh",uri);
+
                 return console.console_out(session);
 
             } else if (uri.contains("console/run")) {
-                SunLog.Log(uri);
+
                 return console.console_run(session);
 
             } else if (uri.contains("console/commandhistory")) {
@@ -77,4 +82,18 @@ public class ConsoleServer extends NanoHTTPD {
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_HTML, "<html><body><h1>Error</h1>" + ex.toString() + "</body></html>");
         }
     }
+
+
+    private Application application;
+    public static HashMap<String, Activity> clazzMap = new HashMap<>();
+
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+
 }
