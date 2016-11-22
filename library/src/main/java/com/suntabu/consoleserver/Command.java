@@ -16,7 +16,28 @@ import fi.iki.elonen.NanoHTTPD;
 public class Command {
 
 
+    public NanoHTTPD.Response handle(String command){
+        ConsoleContent.LogContent.append(" > " + command);
+        String[] strings = command.split(" ");
 
+        if (strings.length >0){
+            if (strings[0].equalsIgnoreCase("clear")){
+
+            }else if(strings[0].equalsIgnoreCase("lm")){
+                return listLogModule();
+            }else if(strings[0].equalsIgnoreCase("help")){
+
+            }else if(strings[0].equalsIgnoreCase("pull")){
+
+            }else if(strings[0].equalsIgnoreCase("push")){
+
+            }
+
+        }
+
+
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),ConsoleContent.Log());
+    }
 
     public NanoHTTPD.Response listLogModule(){
         Set<Map.Entry<String, LogModule>> list = LogManager.getInstance().getModuleDic().entrySet();
@@ -26,8 +47,8 @@ public class Command {
         }
 
 
-        ConsoleContent.LogContent += names;
-        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),ConsoleContent.LogContent);
+        ConsoleContent.LogContent.append(names);
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),ConsoleContent.Log());
     }
 
 
