@@ -17,12 +17,12 @@ public class Command {
 
 
     public NanoHTTPD.Response handle(String command){
-        ConsoleContent.LogContent.append(" > " + command);
+        ConsoleContent.LogContent.append("\n > " + command + "\n");
         String[] strings = command.split(" ");
 
         if (strings.length >0){
             if (strings[0].equalsIgnoreCase("clear")){
-
+                ConsoleContent.LogContent.delete(0,ConsoleContent.LogContent.length());
             }else if(strings[0].equalsIgnoreCase("lm")){
                 return listLogModule();
             }else if(strings[0].equalsIgnoreCase("help")){
@@ -31,8 +31,12 @@ public class Command {
 
             }else if(strings[0].equalsIgnoreCase("push")){
 
+            }else{
+                ConsoleContent.LogContent.append("no found " + strings[0]);
             }
 
+        }else{
+            ConsoleContent.LogContent.append("nothing to show...\n");
         }
 
 
