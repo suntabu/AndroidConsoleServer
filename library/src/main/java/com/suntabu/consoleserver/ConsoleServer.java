@@ -6,6 +6,7 @@ import android.content.res.Resources;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import com.suntabu.log.SunLog;
 
@@ -86,6 +87,7 @@ public class ConsoleServer extends NanoHTTPD {
 
     private Application application;
     public static HashMap<String, Activity> clazzMap = new HashMap<>();
+    public static ArrayList<String> beanList = new ArrayList<>();
 
     public void setApplication(Application application) {
         this.application = application;

@@ -33,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
     public static MainActivity activity;
     private static final int DEFAULT_PORT = 8080;
     private String temp = "测试反射";
+    private boolean boo = true;
+    private char ch = 66;
+    private long lo = 111l;
+    private Temp t = null;
     // INSTANCE OF ANDROID WEB SERVER
     private ConsoleServer androidWebServer;
     private BroadcastReceiver broadcastReceiverNetworkState;
@@ -55,6 +59,12 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e("....", "onCreate:  " + this.getClass().getName());
         ConsoleServer.clazzMap.put(getClass().getName(), this);
+        ConsoleServer.beanList.add(Temp.class.getName());
+        t = new Temp();
+        t.setAge(10);
+        t.setAlive(false);
+        t.setName("HEHE");
+
         // INIT VIEW
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
