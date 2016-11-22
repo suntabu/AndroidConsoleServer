@@ -1,9 +1,12 @@
 package com.suntabu.consoleserver;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.res.Resources;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -16,7 +19,7 @@ public class ConsoleServer extends NanoHTTPD {
 
     private static final String MIME_JSON = "application/json";
     private static final String MIME_CSS = "text/css";
-
+    private Console console = new Console();
 
     public ConsoleServer(String hostname, int port) {
         super(hostname, port);
@@ -37,26 +40,12 @@ public class ConsoleServer extends NanoHTTPD {
 
             }
             Map<String, String> params = session.getParms();
-            if (params.size() == 0) {
+                if (params.size() == 0) {
                 return newFixedLengthResponse(Response.Status.OK, MIME_HTML, ConsoleContent.loadAssets("console_html/index.html"));
             } else {
-                if (uri.contains("command")) {
-                    String command = params.get("command");
-                    String[] strings = command.split(" ");
-                    Class clazz = Class.forName(strings[0]);
-                    if (command.contains("-m")) {
-                        java.lang.reflect.Method method = clazz.getDeclaredMethod(strings[1]);
-
-                    } else if (command.contains("-f")) {
-                        Field field = clazz.getDeclaredField("string[1]");
-                        field.setAccessible(true);
-//                        String result = field.get();
-                    }
-                }
+                Console con = new Console();
+                con.console_run(session);
             }
-
-
-
 
 
             String responseString = "";
@@ -68,4 +57,18 @@ public class ConsoleServer extends NanoHTTPD {
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_HTML, "<html><body><h1>Error</h1>" + ex.toString() + "</body></html>");
         }
     }
+
+
+    private Application application;
+    public static HashMap<String, Activity> clazzMap = new HashMap<>();
+
+    public void setApplication(Application application) {
+        this.application = application;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+
+
 }

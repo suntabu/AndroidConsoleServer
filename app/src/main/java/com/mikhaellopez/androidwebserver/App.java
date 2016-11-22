@@ -1,19 +1,19 @@
 package com.mikhaellopez.androidwebserver;
 
+import android.app.Activity;
 import android.app.Application;
-import android.util.Log;
+import android.content.Context;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import com.suntabu.consoleserver.ConsoleServer;
 
-import dalvik.system.DexFile;
+import java.util.HashMap;
 
 /**
  * Created by Administrator on 2016/11/22.
  */
 
 public class App extends Application {
+    public static App instance;
 
     @Override
     public void onCreate() {
@@ -31,8 +31,9 @@ public class App extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }*/
-
-
-
+        instance = this;
+        ConsoleServer consoleServer = new ConsoleServer(8080);
+        consoleServer.setApplication(instance);
     }
+
 }

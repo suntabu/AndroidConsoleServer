@@ -15,6 +15,10 @@ public class ConsoleContent {
 
     private static Context context;
 
+    public static String LogContent = "hahahhaha";
+
+
+
     public static void init(Context ctx){
         context = ctx;
     }
@@ -38,4 +42,7 @@ public class ConsoleContent {
             return "";
         }
     }
+
+
+
 }

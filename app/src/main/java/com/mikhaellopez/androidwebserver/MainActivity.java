@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         activity = this;
         ConsoleContent.init(this);
+        Log.e("....", "onCreate:  " + this.getClass().getName());
+        ConsoleServer.clazzMap.put(getClass().getName(), this);
         // INIT VIEW
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
@@ -80,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         // INIT BROADCAST RECEIVER TO LISTEN NETWORK STATE CHANGED
         initBroadcastReceiverNetworkStateChanged();
-        Log.e("....", "onCreate:  " + this.getClass().getName());
+
     }
 
     //region Start And Stop AndroidWebServer
@@ -181,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         if (broadcastReceiverNetworkState != null) {
             unregisterReceiver(broadcastReceiverNetworkState);
         }
+        ConsoleServer.clazzMap.remove(getClass().getName());
     }
 
 }
