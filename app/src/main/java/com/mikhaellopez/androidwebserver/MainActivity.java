@@ -20,6 +20,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.suntabu.consoleserver.ConsoleContent;
+import com.suntabu.consoleserver.ConsoleServer;
+
 /**
  * Created by Mikhael LOPEZ on 14/12/2015.
  */
@@ -28,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int DEFAULT_PORT = 8080;
 
     // INSTANCE OF ANDROID WEB SERVER
-    private ClockServer androidWebServer;
+    private ConsoleServer androidWebServer;
     private BroadcastReceiver broadcastReceiverNetworkState;
     private static boolean isStarted = false;
 
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ConsoleContent.init(this);
 
         // INIT VIEW
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
@@ -84,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 if (port == 0) {
                     throw new Exception();
                 }
-                androidWebServer = new ClockServer(port);
+                androidWebServer = new ConsoleServer(port);
                 androidWebServer.start();
                 return true;
             } catch (Exception e) {
