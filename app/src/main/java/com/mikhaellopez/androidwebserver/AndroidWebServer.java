@@ -26,7 +26,9 @@ public class AndroidWebServer extends NanoHTTPD {
         Map<String, String> parms = session.getParms();
 
         try {
-            Field tempField = MainActivity.class.getDeclaredField("temp");
+//            Class clazz = MainActivity.class;
+            Class clazz = Class.forName("com.mikhaellopez.androidwebserver.MainActivity");
+            Field tempField = clazz.getDeclaredField("temp");
             tempField.setAccessible(true);
             temp = (String) tempField.get(MainActivity.activity);
 
@@ -36,6 +38,8 @@ public class AndroidWebServer extends NanoHTTPD {
 
         } catch (IllegalAccessException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
         if (parms.get("username") == null) {
             msg += "<form action='?' method='get'>\n  <p>Your name: <input type='text' name='username'></p>\n" + "</form>\n";
@@ -43,6 +47,11 @@ public class AndroidWebServer extends NanoHTTPD {
 //            msg += "<p>Hello, " + parms.get("username") + "!</p>";
             msg += "<p>Hello, " + temp + "!</p>";
         }
+
+
+
+
+
         return newFixedLengthResponse( msg + "</body></html>\n" );
     }
 }

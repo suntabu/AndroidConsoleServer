@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int DEFAULT_PORT = 8080;
     private String temp = "测试反射";
     // INSTANCE OF ANDROID WEB SERVER
-    private AndroidWebServer androidWebServer;
+    private ClockServer androidWebServer;
     private BroadcastReceiver broadcastReceiverNetworkState;
     private static boolean isStarted = false;
 
@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 if (port == 0) {
                     throw new Exception();
                 }
-                androidWebServer = new AndroidWebServer(port);
+                androidWebServer = new ClockServer(port);
                 androidWebServer.start();
                 return true;
             } catch (Exception e) {
