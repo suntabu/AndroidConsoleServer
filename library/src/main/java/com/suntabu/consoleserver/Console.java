@@ -6,11 +6,18 @@ package com.suntabu.consoleserver;
  */
 
 import android.app.Activity;
+import android.util.Log;
 
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
@@ -31,30 +38,67 @@ public class Console {
     }
 
 
-    public Response console_run(IHTTPSession session) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException {
+    public Response console_run(IHTTPSession session) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, UnsupportedEncodingException {
         String command = session.getParms().get("command");
+        command = URLDecoder.decode(command, "UTF-8");
         if (mCommandRecord.size() >= 10) {
             mCommandRecord.remove(0);
         }
-        command = URLDecoder.decode(command);
         mCommandRecord.add(command);
         String[] strings = command.split(" ");
         for (Map.Entry<String, Activity> entry : ConsoleServer.clazzMap.entrySet()) {
             if (entry.getKey().contains(strings[0])) {
                 Class clazz = Class.forName(entry.getKey());
+                String last = strings[strings.length - 1];
+                String lastTemp = last.substring(last.indexOf("(") + 1, last.indexOf(")"));
                 if (command.contains("-m")) {
                     java.lang.reflect.Method method = clazz.getDeclaredMethod(strings[1]);
 
-                } else if (command.contains("-f")) {
+                } else {
                     Field field = clazz.getDeclaredField(strings[1]);
                     field.setAccessible(true);
-                    result = (String) field.get(entry.getValue());
+                    result = processField(field.get(entry.getValue()), lastTemp);
                 }
             }
         }
 //        String result = runCommand(command);
         ConsoleContent.LogContent += "\n" + result + "\n";
         return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.LogContent);
+    }
+
+    private String processField(Object o, String... params) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+        String temp1 = "";
+        Log.e("....", "processField: " + params[0]);
+        if (params.length == 1) {
+            StringBuffer sb = new StringBuffer();
+            for (String s : ConsoleServer.beanList) {
+                if (s.contains(params[0])) {
+                    temp1 += s;
+                }
+            }
+
+            Class clazz = Class.forName(temp1);
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field f : fields) {
+                Field tempField = clazz.getDeclaredField(f.getName());
+                tempField.setAccessible(true);
+                sb.append(tempField.getName() + " = " + tempField.get(tempField.getName()) + "\n");
+            }
+            return new String(sb);
+        }
+
+        if (o instanceof String) {
+            return (String) o;
+        } else if (o instanceof List) {
+
+        } else if (o instanceof HashMap) {
+
+        } else if (o instanceof Array) {
+
+        } else {
+            return o.toString();
+        }
+        return "";
     }
 
     public Response console_history(IHTTPSession session) {
@@ -83,8 +127,6 @@ public class Console {
 
 
     private String runCommand(String command) {
-
-
 
 
         return "run :" + command;
