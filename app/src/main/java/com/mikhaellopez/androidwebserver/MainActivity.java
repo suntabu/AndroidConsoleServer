@@ -22,15 +22,18 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.suntabu.consoleserver.ConsoleContent;
+import com.suntabu.consoleserver.ConsoleServer;
+
 /**
  * Created by Mikhael LOPEZ on 14/12/2015.
  */
 public class MainActivity extends AppCompatActivity {
-    public static MainActivity activity ;
+    public static MainActivity activity;
     private static final int DEFAULT_PORT = 8080;
     private String temp = "测试反射";
     // INSTANCE OF ANDROID WEB SERVER
-    private ClockServer androidWebServer;
+    private ConsoleServer androidWebServer;
     private BroadcastReceiver broadcastReceiverNetworkState;
     private static boolean isStarted = false;
 
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         activity = this;
+        ConsoleContent.init(this);
         // INIT VIEW
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
         // INIT BROADCAST RECEIVER TO LISTEN NETWORK STATE CHANGED
         initBroadcastReceiverNetworkStateChanged();
-        Log.e("....", "onCreate:  this.getClass().getName()");
+        Log.e("....", "onCreate:  " + this.getClass().getName());
     }
 
     //region Start And Stop AndroidWebServer
@@ -87,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 if (port == 0) {
                     throw new Exception();
                 }
-                androidWebServer = new ClockServer(port);
+                androidWebServer = new ConsoleServer(port);
                 androidWebServer.start();
                 return true;
             } catch (Exception e) {
