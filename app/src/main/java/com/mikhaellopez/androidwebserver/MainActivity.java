@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.suntabu.ACS;
 import com.suntabu.consoleserver.ConsoleContent;
 import com.suntabu.consoleserver.ConsoleServer;
 
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ConsoleContent.init(this);
+        ACS.init(this);
 
         // INIT VIEW
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);

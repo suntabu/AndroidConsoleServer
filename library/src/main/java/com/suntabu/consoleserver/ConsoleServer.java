@@ -2,7 +2,10 @@ package com.suntabu.consoleserver;
 
 import android.content.res.Resources;
 
+import com.suntabu.log.SunLog;
+
 import java.util.Map;
+import java.util.logging.Logger;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -39,11 +42,11 @@ public class ConsoleServer extends NanoHTTPD {
             }
 
             if (uri.contains("console/out")) {
-
+                SunLog.Log("refresh",uri);
                 return console.console_out(session);
 
             } else if (uri.contains("console/run")) {
-
+                SunLog.Log(uri);
                 return console.console_run(session);
 
             } else if (uri.contains("console/commandhistory")) {

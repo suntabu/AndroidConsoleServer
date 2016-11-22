@@ -3,6 +3,8 @@ package com.suntabu.consoleserver;
 import android.content.Context;
 import android.content.res.AssetManager;
 
+import com.suntabu.ACS;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -13,18 +15,14 @@ import java.io.InputStream;
 public class ConsoleContent {
 
 
-    private static Context context;
 
     public static String LogContent = "hahahhaha";
 
 
 
-    public static void init(Context ctx){
-        context = ctx;
-    }
 
     public static String loadAssets(String path){
-        String fileContent = readAssetsTextFile(context.getResources().getAssets(),path);
+        String fileContent = readAssetsTextFile(ACS.getContext().getResources().getAssets(),path);
         return fileContent;
     }
 
