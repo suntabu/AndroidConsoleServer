@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.suntabu.ACS;
 import com.suntabu.consoleserver.ConsoleContent;
 import com.suntabu.consoleserver.ConsoleServer;
 
@@ -52,8 +53,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ACS.init(this);
+
         activity = this;
-        ConsoleContent.init(this);
+
         Log.e("....", "onCreate:  " + this.getClass().getName());
         ConsoleServer.clazzMap.put(getClass().getName(), this);
         ConsoleServer.beanList.add(Temp.class.getName());
@@ -92,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
 
         // INIT BROADCAST RECEIVER TO LISTEN NETWORK STATE CHANGED
         initBroadcastReceiverNetworkStateChanged();
-
     }
 
     //region Start And Stop AndroidWebServer
@@ -193,7 +195,6 @@ public class MainActivity extends AppCompatActivity {
         if (broadcastReceiverNetworkState != null) {
             unregisterReceiver(broadcastReceiverNetworkState);
         }
-        ConsoleServer.clazzMap.remove(getClass().getName());
     }
 
 }
