@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -38,7 +40,7 @@ public class Console {
     }
 
 
-    public Response console_run(IHTTPSession session) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, UnsupportedEncodingException {
+    public Response console_run(IHTTPSession session) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, UnsupportedEncodingException, InvocationTargetException {
         String command = session.getParms().get("command");
         command = URLDecoder.decode(command, "UTF-8");
         if (mCommandRecord.size() >= 10) {
@@ -66,9 +68,8 @@ public class Console {
         return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.LogContent);
     }
 
-    private String processField(Object o, String... params) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException {
+    private String processField(Object o, String... params) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         String temp1 = "";
-        Log.e("....", "processField: " + params[0]);
         if (params.length == 1) {
             StringBuffer sb = new StringBuffer();
             for (String s : ConsoleServer.beanList) {
@@ -80,9 +81,11 @@ public class Console {
             Class clazz = Class.forName(temp1);
             Field[] fields = clazz.getDeclaredFields();
             for (Field f : fields) {
-                Field tempField = clazz.getDeclaredField(f.getName());
-                tempField.setAccessible(true);
-                sb.append(tempField.getName() + " = " + tempField.get(tempField.getName()) + "\n");
+                String name = f.getName();
+                name = name.substring(0, 1).toUpperCase() + name.substring(1);
+                Method m = clazz.getDeclaredMethod("get" + name);
+                String value = (String) m.invoke(clazz);
+                sb.append(f.getName() + " = " + value + "\n");
             }
             return new String(sb);
         }

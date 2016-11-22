@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         activity = this;
 
         Log.e("....", "onCreate:  " + this.getClass().getName());
+        Log.e("....", "onCreate:  " + Temp.class.getName());
         ConsoleServer.clazzMap.put(getClass().getName(), this);
         ConsoleServer.beanList.add(Temp.class.getName());
         t = new Temp();
