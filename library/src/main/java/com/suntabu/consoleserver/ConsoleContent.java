@@ -14,11 +14,14 @@ import java.io.InputStream;
 
 public class ConsoleContent {
 
+    private static final int MAX_CACHE = 100;
 
 
-    public static String LogContent = "hahahhaha";
+    public static StringBuilder LogContent = new StringBuilder("Happy Coding\n");
 
-
+    public static String Log(){
+        return LogContent.toString();
+    }
 
 
     public static String loadAssets(String path){

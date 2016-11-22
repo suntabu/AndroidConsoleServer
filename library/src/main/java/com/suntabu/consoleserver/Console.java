@@ -33,10 +33,13 @@ public class Console {
     private static final int MAX_RECORD = 10;
     private ArrayList<String> mCommandRecord = new ArrayList<>();
     private String result;
-
+    private Command commandHandler;
+    public Console(){
+        commandHandler = new Command();
+    }
 
     public Response console_out(IHTTPSession session) {
-        return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.LogContent);
+        return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());
     }
 
 
@@ -47,7 +50,10 @@ public class Console {
             mCommandRecord.remove(0);
         }
         mCommandRecord.add(command);
-        String[] strings = command.split(" ");
+
+        return  commandHandler.handle(command);
+
+        /*String[] strings = command.split(" ");
         for (Map.Entry<String, Activity> entry : ConsoleServer.clazzMap.entrySet()) {
             if (entry.getKey().contains(strings[0])) {
                 Class clazz = Class.forName(entry.getKey());
@@ -64,8 +70,8 @@ public class Console {
             }
         }
 //        String result = runCommand(command);
-        ConsoleContent.LogContent += "\n" + result + "\n";
-        return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.LogContent);
+        ConsoleContent.LogContent.append("\n" + result + "\n");
+        return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());*/
     }
 
     private String processField(Object o, String... params) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
@@ -129,10 +135,6 @@ public class Console {
     }
 
 
-    private String runCommand(String command) {
 
-
-        return "run :" + command;
-    }
 
 }
