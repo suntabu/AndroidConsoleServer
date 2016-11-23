@@ -141,7 +141,7 @@ public class Console {
         String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
         File file = new File(filePath);
         try {
-            ConsoleContent.append("download... ");
+            ConsoleContent.append("download... " + filePath);
             FileInputStream fin = new FileInputStream(file);
             NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/octet-stream", fin, file.length());
             response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));

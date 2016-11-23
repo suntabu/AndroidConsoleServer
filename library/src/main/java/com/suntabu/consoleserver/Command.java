@@ -67,10 +67,11 @@ public class Command {
 
     public NanoHTTPD.Response pullLogModule(String moduleName){
 
-        String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
-        File file = new File(filePath);
+
         try {
-            ConsoleContent.append("download... ");
+            String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
+            File file = new File(filePath);
+
             FileInputStream fin = new FileInputStream(file);
             NanoHTTPD.Response  response =  NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"log/pull?file="+moduleName);
             response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
@@ -79,19 +80,13 @@ public class Command {
             e.printStackTrace();
             ConsoleContent.append("download error: " + e.getMessage());
             return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
+        }catch (Exception e){
+            ConsoleContent.append("error: " + e.getMessage());
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
         }
 
-
-
-
-
-
-
     }
 
 
-    public void pullLog(String moduleName){
-
-    }
 
 }
