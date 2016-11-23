@@ -5,23 +5,25 @@ package com.suntabu.consoleserver;
  * Created by gouzhun on 2016/11/22.
  */
 
-import android.app.Activity;
 import android.util.Log;
 
-import org.json.JSONObject;
+import com.suntabu.log.LogManager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;
 
@@ -50,7 +52,28 @@ public class Console {
             mCommandRecord.remove(0);
         }
         mCommandRecord.add(command);
+
         return commandHandler.handle(command);
+
+        /*String[] strings = command.split(" ");
+        for (Map.Entry<String, Activity> entry : ConsoleServer.clazzMap.entrySet()) {
+            if (entry.getKey().contains(strings[0])) {
+                Class clazz = Class.forName(entry.getKey());
+                String last = strings[strings.length - 1];
+                String lastTemp = last.substring(last.indexOf("(") + 1, last.indexOf(")"));
+                if (command.contains("-m")) {
+                    java.lang.reflect.Method method = clazz.getDeclaredMethod(strings[1]);
+
+                } else {
+                    Field field = clazz.getDeclaredField(strings[1]);
+                    field.setAccessible(true);
+                    result = processField(field.get(entry.getValue()), lastTemp);
+                }
+            }
+        }
+//        String result = runCommand(command);
+        ConsoleContent.LogContent.append("\n" + result + "\n");
+        return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());*/
     }
 
     //TODO
@@ -115,4 +138,22 @@ public class Console {
     }
 
 
+    public Response log_pull(IHTTPSession session) {
+        String moduleName = session.getParms().get("file");
+
+
+        String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
+        File file = new File(filePath);
+        try {
+            ConsoleContent.append("download... ");
+            FileInputStream fin = new FileInputStream(file);
+            NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/octet-stream", fin, file.length());
+            response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
+            return response;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            ConsoleContent.append("download error: " + e.getMessage());
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
+        }
+    }
 }

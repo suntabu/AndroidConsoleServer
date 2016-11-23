@@ -32,7 +32,9 @@ import com.suntabu.consoleserver.ConsoleServer;
 public class MainActivity extends AppCompatActivity {
     public static MainActivity activity;
     private static final int DEFAULT_PORT = 8080;
+
     private String temp = "测试反射";
+    private String staticStr = "静态字段测试反射";
     private boolean boo = true;
     private char ch = 66;
     private long lo = 111l;
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         t.setAlive(false);
         t.setName("HEHE");
         Log.e("....", "onCreate:  " + t.getClass().getName());
-
+        String tt = "局部变量反射" ;
         // INIT VIEW
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         editTextPort = (EditText) findViewById(R.id.editTextPort);

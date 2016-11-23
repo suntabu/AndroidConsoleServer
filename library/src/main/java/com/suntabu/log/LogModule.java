@@ -1,6 +1,5 @@
 package com.suntabu.log;
 
-import android.os.SystemClock;
 import android.util.Log;
 
 import com.suntabu.consoleserver.ConsoleContent;
@@ -19,12 +18,17 @@ public class LogModule {
 
     private String moduleName;
 
-    private String getFilePath(){
-        String filePath = LogManager.getInstance().getLogPath() + "/" + moduleName + "/" + new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        new File(filePath).mkdirs();
+    public String getFilePath() {
+        String filePath = getParentPath() + "/" + moduleName + "_" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".log";
         return filePath;
     }
 
+
+    public String getParentPath(){
+        String folder = LogManager.getInstance().getLogPath() + "/" + moduleName;
+        new File(folder).mkdirs();
+        return folder;
+    }
 
 
     public LogModule(String moduleName) {
@@ -36,23 +40,23 @@ public class LogModule {
         String format = "[%s] : %s";
 
 
-        String content = String.format(format,new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()),msg + " " );
+        String content = String.format(format, new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()), msg + " ");
 
         ConsoleContent.append(content);
 
-        if (LogManager.getInstance().IsLogConsoleEnable){
-            Log.i(moduleName,content);
+        if (LogManager.getInstance().IsLogConsoleEnable) {
+            Log.i(moduleName, content);
         }
 
 
-        if (LogManager.getInstance().IsLogFileEnable){
+        if (LogManager.getInstance().IsLogFileEnable) {
             FileWriter fw = null;
             try {
                 fw = new FileWriter(getFilePath());
                 fw.write(content);
                 fw.close();
             } catch (IOException e) {
-                Log.i(moduleName,e.getMessage());
+                Log.i(moduleName, e.getMessage());
             }
 
         }

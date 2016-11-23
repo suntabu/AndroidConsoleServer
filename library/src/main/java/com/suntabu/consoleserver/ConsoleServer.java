@@ -45,6 +45,8 @@ public class ConsoleServer extends NanoHTTPD {
                 return newFixedLengthResponse(Response.Status.OK, MIME_CSS, ConsoleContent.loadAssets("console_html/console.css"));
             } else if (uri.contains("favicon.icon")) {
 
+            }else if(uri.contains("jquery.min.js")){
+                return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("js"), ConsoleContent.loadAssets("console_html/jQuery.min.js"));
             }
 
             if (uri.contains("console/out")) {
@@ -64,6 +66,8 @@ public class ConsoleServer extends NanoHTTPD {
 
                 return console.console_complete(session);
 
+            }else if(uri.contains("log/pull")){
+                return console.log_pull(session);
             }
 
 
