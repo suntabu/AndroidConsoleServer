@@ -32,9 +32,9 @@ import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 public class Console {
     private static final int MAX_RECORD = 10;
     private ArrayList<String> mCommandRecord = new ArrayList<>();
-    private String result;
     private Command commandHandler;
-    public Console(){
+
+    public Console() {
         commandHandler = new Command();
     }
 
@@ -43,44 +43,24 @@ public class Console {
     }
 
 
-    public Response console_run(IHTTPSession session) throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException, ClassNotFoundException, UnsupportedEncodingException, InvocationTargetException {
+    public Response console_run(IHTTPSession session) throws UnsupportedEncodingException {
         String command = session.getParms().get("command");
         command = URLDecoder.decode(command, "UTF-8");
         if (mCommandRecord.size() >= 10) {
             mCommandRecord.remove(0);
         }
         mCommandRecord.add(command);
-
-        return  commandHandler.handle(command);
-
-        /*String[] strings = command.split(" ");
-        for (Map.Entry<String, Activity> entry : ConsoleServer.clazzMap.entrySet()) {
-            if (entry.getKey().contains(strings[0])) {
-                Class clazz = Class.forName(entry.getKey());
-                String last = strings[strings.length - 1];
-                String lastTemp = last.substring(last.indexOf("(") + 1, last.indexOf(")"));
-                if (command.contains("-m")) {
-                    java.lang.reflect.Method method = clazz.getDeclaredMethod(strings[1]);
-
-                } else {
-                    Field field = clazz.getDeclaredField(strings[1]);
-                    field.setAccessible(true);
-                    result = processField(field.get(entry.getValue()), lastTemp);
-                }
-            }
-        }
-//        String result = runCommand(command);
-        ConsoleContent.LogContent.append("\n" + result + "\n");
-        return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());*/
+        return commandHandler.handle(command);
     }
 
+    //TODO
     private String processField(Object o, String... params) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         String temp1 = "";
         if (params.length == 1) {
             StringBuffer sb = new StringBuffer();
-            for (String s : ConsoleServer.beanList) {
-                if (s.contains(params[0])) {
-                    temp1 += s;
+            for (Map.Entry<String, ?> m : ConsoleServer.beanMap.entrySet()) {
+                if (m.getKey().contains(params[0])) {
+                    temp1 += m.getKey();
                 }
             }
 
@@ -133,8 +113,6 @@ public class Console {
 
         return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), "");
     }
-
-
 
 
 }
