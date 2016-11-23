@@ -33,12 +33,12 @@ public class LogModule {
 
     public void Log(String msg) {
 
-        String format = "\n [%s] : %s";
+        String format = "[%s] : %s";
 
 
         String content = String.format(format,new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()),msg + " " );
 
-        ConsoleContent.LogContent.append(content);
+        ConsoleContent.append(content);
 
         if (LogManager.getInstance().IsLogConsoleEnable){
             Log.i(moduleName,content);
