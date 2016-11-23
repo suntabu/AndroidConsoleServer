@@ -8,7 +8,7 @@ textarea.console {
   background-color:#383838;
   color:#F0F0F0;
   font-size:14px;
-  font-family:;"Courier New", Courier, monospace;
+  font-family: Monaco, DejaVu Sans Mono, Bitstream Vera Sans Mono, Consolas, Courier New, monospace;
 
 }
 #output {

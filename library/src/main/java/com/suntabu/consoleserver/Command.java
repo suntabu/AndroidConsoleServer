@@ -30,26 +30,24 @@ import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 public class Command {
 
 
-    private static final String TAG = "Command";
-
-    public NanoHTTPD.Response handle(String command) {
+    public NanoHTTPD.Response handle(String command){
         ConsoleContent.append("> " + command);
         String[] strings = command.split(" ");
 
-        if (strings.length > 0) {
-            if (strings[0].equalsIgnoreCase("clear")) {
+        if (strings.length >0){
+            if (strings[0].equalsIgnoreCase("clear")){
                 ConsoleContent.clear();
-            } else if (strings[0].equalsIgnoreCase("lm")) {
+            }else if(strings[0].equalsIgnoreCase("lm")){
                 return listLogModule();
-            } else if (strings[0].equalsIgnoreCase("help")) {
+            }else if(strings[0].equalsIgnoreCase("help")){
 
-            } else if (strings[0].equalsIgnoreCase("pull")) {
-                if (strings.length >= 2) {
+            }else if(strings[0].equalsIgnoreCase("pull")){
+                if (strings.length >= 2){
                     return pullLogModule(strings[1]);
-                } else {
+                }else{
                     ConsoleContent.append("expect <module name>");
                 }
-            } else if (strings[0].equalsIgnoreCase("push")) {
+            }else if(strings[0].equalsIgnoreCase("push")){
 
             } else if (strings[0].equalsIgnoreCase("check")) {
                 return checkVar(command);
@@ -117,38 +115,38 @@ public class Command {
     public NanoHTTPD.Response listLogModule() {
         Set<Map.Entry<String, LogModule>> list = LogManager.getInstance().getModuleDic().entrySet();
         String names = "Modules: \n";
-        for (Map.Entry<String, LogModule> entry : list) {
-            names += "\t\t" + entry.getKey() + "\n";
+        for (Map.Entry<String,LogModule> entry: list){
+            names +="\t\t"+ entry.getKey()+"\n";
         }
 
 
         ConsoleContent.append(names);
-        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), ConsoleContent.Log());
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),ConsoleContent.Log());
     }
 
 
-    public NanoHTTPD.Response pullLogModule(String moduleName) {
+    public NanoHTTPD.Response pullLogModule(String moduleName){
 
-        String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
-        File file = new File(filePath);
+
         try {
-            ConsoleContent.append("download... ");
+            String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
+            File file = new File(filePath);
+
             FileInputStream fin = new FileInputStream(file);
-            NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "log/pull?file=" + moduleName);
+            NanoHTTPD.Response  response =  NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"log/pull?file="+moduleName);
             response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
             return response;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             ConsoleContent.append("download error: " + e.getMessage());
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
+        }catch (Exception e){
+            ConsoleContent.append("error: " + e.getMessage());
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
         }
 
-
     }
 
 
-    public void pullLog(String moduleName) {
-
-    }
 
 }

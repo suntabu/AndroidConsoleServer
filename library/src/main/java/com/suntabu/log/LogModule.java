@@ -52,8 +52,8 @@ public class LogModule {
         if (LogManager.getInstance().IsLogFileEnable) {
             FileWriter fw = null;
             try {
-                fw = new FileWriter(getFilePath());
-                fw.write(content);
+                fw = new FileWriter(getFilePath(),true);
+                fw.write("\n"+content);
                 fw.close();
             } catch (IOException e) {
                 Log.i(moduleName, e.getMessage());

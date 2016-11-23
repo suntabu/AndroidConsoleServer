@@ -54,8 +54,6 @@ public class ConsoleServer extends NanoHTTPD {
                 return console.console_out(session);
 
             } else if (uri.contains("console/run")) {
-                SunLog.Log("hahahhaasdf");
-                SunLog.Log("refresh","hahahhaasdf");
                 return console.console_run(session);
 
             } else if (uri.contains("console/commandhistory")) {

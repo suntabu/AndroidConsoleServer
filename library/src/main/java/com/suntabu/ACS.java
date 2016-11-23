@@ -1,6 +1,9 @@
 package com.suntabu;
 
 import android.content.Context;
+import android.util.Log;
+
+import com.suntabu.consoleserver.ConsoleServer;
 
 import java.io.File;
 
@@ -16,9 +19,24 @@ import java.io.File;
 public class ACS {
 
     private static Context context;
+    private static boolean isStarted;
+    private static int port = 8443;
+    private static ConsoleServer consoleServer;
 
+//TODO: wifi_state_changed and network_changed broadcast callback for server
     public static void init(Context ctx){
         context = ctx;
+    }
+
+
+    /**
+     *
+     * @param ctx
+     * @param pt listen port on
+     */
+    public static void init(Context ctx,int pt){
+        init(context);
+        port = pt;
     }
 
 
@@ -35,5 +53,35 @@ public class ACS {
         }
         return file.mkdir();
     }
+
+
+    //region Start And Stop AndroidWebServer
+    public static boolean startAndroidWebServer() {
+        if (!isStarted) {
+            try {
+                if (port == 0) {
+                    throw new Exception();
+                }
+                consoleServer = new ConsoleServer(port);
+                consoleServer.start();
+                isStarted = true;
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.e("Server","The PORT " + port + " doesn't work, please change it between 1000 and 9999.");
+            }
+        }
+        return false;
+    }
+
+    private static boolean stopAndroidWebServer() {
+        if (isStarted && consoleServer != null) {
+            consoleServer.stop();
+            isStarted = false;
+            return true;
+        }
+        return false;
+    }
+    //endregion
 
 }
