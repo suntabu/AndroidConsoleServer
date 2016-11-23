@@ -10,7 +10,6 @@ public class SunLog {
         LogManager.getInstance().Log("-app-",msg);
     }
 
-
     public static void Log(String module,String msg){
         LogManager.getInstance().Log(module,msg);
     }

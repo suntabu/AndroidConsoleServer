@@ -25,12 +25,12 @@ public class Command {
 
 
     public NanoHTTPD.Response handle(String command) {
-        ConsoleContent.LogContent.append(" > " + command);
+        ConsoleContent.append("> " + command);
         String[] strings = command.split(" ");
 
         if (strings.length > 0) {
             if (strings[0].equalsIgnoreCase("clear")) {
-
+                ConsoleContent.clear();
             } else if (strings[0].equalsIgnoreCase("lm")) {
                 return listLogModule();
             } else if (strings[0].equalsIgnoreCase("help")) {
@@ -41,8 +41,12 @@ public class Command {
 
             } else if (strings[0].equalsIgnoreCase("ck")) {
                 return checkVar(command);
+            } else {
+                ConsoleContent.append("no found " + strings[0]);
             }
 
+        } else {
+            ConsoleContent.append("nothing to show...");
         }
 
 
@@ -92,7 +96,7 @@ public class Command {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
-        ConsoleContent.LogContent.append("\n" + result + "\n");
+        ConsoleContent.append("\n" + result + "\n");
         return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());
     }
 
@@ -104,7 +108,7 @@ public class Command {
         }
 
 
-        ConsoleContent.LogContent.append(names);
+        ConsoleContent.append(names);
         return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), ConsoleContent.Log());
     }
 
