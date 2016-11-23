@@ -55,25 +55,6 @@ public class Console {
 
         return commandHandler.handle(command);
 
-        /*String[] strings = command.split(" ");
-        for (Map.Entry<String, Activity> entry : ConsoleServer.clazzMap.entrySet()) {
-            if (entry.getKey().contains(strings[0])) {
-                Class clazz = Class.forName(entry.getKey());
-                String last = strings[strings.length - 1];
-                String lastTemp = last.substring(last.indexOf("(") + 1, last.indexOf(")"));
-                if (command.contains("-m")) {
-                    java.lang.reflect.Method method = clazz.getDeclaredMethod(strings[1]);
-
-                } else {
-                    Field field = clazz.getDeclaredField(strings[1]);
-                    field.setAccessible(true);
-                    result = processField(field.get(entry.getValue()), lastTemp);
-                }
-            }
-        }
-//        String result = runCommand(command);
-        ConsoleContent.LogContent.append("\n" + result + "\n");
-        return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());*/
     }
 
     //TODO

@@ -28,7 +28,7 @@ import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
  */
 
 public class Command {
-
+    private static final String TAG = "Command";
 
     public NanoHTTPD.Response handle(String command){
         ConsoleContent.append("> " + command);
