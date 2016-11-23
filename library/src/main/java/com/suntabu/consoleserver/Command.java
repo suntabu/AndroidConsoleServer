@@ -3,6 +3,11 @@ package com.suntabu.consoleserver;
 import com.suntabu.log.LogManager;
 import com.suntabu.log.LogModule;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +33,11 @@ public class Command {
             }else if(strings[0].equalsIgnoreCase("help")){
 
             }else if(strings[0].equalsIgnoreCase("pull")){
-
+                if (strings.length >= 2){
+                    return pullLogModule(strings[1]);
+                }else{
+                    ConsoleContent.append("expect <module name>");
+                }
             }else if(strings[0].equalsIgnoreCase("push")){
 
             }else{
@@ -53,6 +62,31 @@ public class Command {
 
         ConsoleContent.append(names);
         return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),ConsoleContent.Log());
+    }
+
+
+    public NanoHTTPD.Response pullLogModule(String moduleName){
+
+        String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
+        File file = new File(filePath);
+        try {
+            ConsoleContent.append("download... ");
+            FileInputStream fin = new FileInputStream(file);
+            NanoHTTPD.Response  response =  NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"log/pull?file="+moduleName);
+            response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
+            return response;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            ConsoleContent.append("download error: " + e.getMessage());
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
+        }
+
+
+
+
+
+
+
     }
 
 
