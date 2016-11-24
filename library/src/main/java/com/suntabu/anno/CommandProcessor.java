@@ -23,7 +23,7 @@ public class CommandProcessor {
     }
 
 
-    public NanoHTTPD.Response procesgit s(String comm) {
+    public NanoHTTPD.Response process(String comm) {
         Method[] ms = AnnotationMethod.class.getDeclaredMethods();
         for (Method method : ms) {
             if (method.isAnnotationPresent(Command.class)) {
