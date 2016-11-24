@@ -46,22 +46,16 @@ public class ConsoleContent {
         outputs.clear();
     }
 
-    public static String loadAssets(String path) throws IOException {
-        String fileContent = readAssetsTextFile(ACS.getContext().getResources().getAssets(),path);
+    public static InputStream loadAssets(String path) throws IOException {
+        InputStream fileContent = readAssetsTextFile(ACS.getContext().getResources().getAssets(),path);
         return fileContent;
     }
 
 
 
-    private static String readAssetsTextFile(AssetManager am, String fileName) throws IOException {
-
+    private static InputStream readAssetsTextFile(AssetManager am, String fileName) throws IOException {
             InputStream is = am.open(fileName);
-            byte[] buffer = new byte[is.available()];
-            is.read(buffer);
-            String json = new String(buffer, "utf-8");
-            is.close();
-            return json;
-
+            return is;
     }
 
 

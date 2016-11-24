@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.res.Resources;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,13 +75,14 @@ public class ConsoleServer extends NanoHTTPD {
             if (matcher.find()) {
                 String key = matcher.group();
                 String[] strs = key.split("\\.");
-                if (strs.length>=1){
-                    String mimeType = strs[strs.length -1];
-                    if (fileTypes.containsKey(mimeType))
-                        return newFixedLengthResponse(Response.Status.OK, fileTypes.get(mimeType), ConsoleContent.loadAssets(ASSET_BASE + key));
-                    else
+                if (strs.length >= 1) {
+                    String mimeType = strs[strs.length - 1];
+                    if (fileTypes.containsKey(mimeType)) {
+                        InputStream inputStream = ConsoleContent.loadAssets(ASSET_BASE + key);
+                        return newFixedLengthResponse(Response.Status.OK, fileTypes.get(mimeType), inputStream, inputStream.available());
+                    } else
                         return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), "unsupported " + key);
-                }else{
+                } else {
                     return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), "error for " + key);
                 }
 
@@ -112,7 +114,7 @@ public class ConsoleServer extends NanoHTTPD {
 
         } catch (Resources.NotFoundException nfe) {
             ConsoleContent.append(nfe.getMessage());
-            return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found " + nfe.getMessage()) ;
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found " + nfe.getMessage());
         } catch (Exception ex) {
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_HTML, "<html><body><h1>Error</h1>" + ex.toString() + "</body></html>");
         }
