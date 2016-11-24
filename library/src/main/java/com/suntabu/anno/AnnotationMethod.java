@@ -1,21 +1,18 @@
-package com.suntabu.consoleserver;
+package com.suntabu.anno;
 
 import android.app.Activity;
 import android.util.Log;
 
 import com.suntabu.ACS;
+import com.suntabu.anno.Command;
+import com.suntabu.consoleserver.ConsoleContent;
 import com.suntabu.log.LogManager;
 import com.suntabu.log.LogModule;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 
@@ -25,49 +22,58 @@ import static fi.iki.elonen.NanoHTTPD.mimeTypes;
 import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 
 /**
- * Created by gouzhun on 2016/11/22.
+ * Created by Administrator on 2016/11/24.
  */
 
-public class Command {
-    private static final String TAG = "Command";
+public class AnnotationMethod {
+    private static String TAG = "AnnotationMethod";
+    private static AnnotationMethod annoMethod;
 
-    public NanoHTTPD.Response handle(String command){
+    public static AnnotationMethod getInstance() {
+        if (annoMethod == null) {
+            annoMethod = new AnnotationMethod();
+        }
+        return annoMethod;
+    }
+
+
+    /**
+     * @param command 命令
+     * @return html
+     */
+    public NanoHTTPD.Response excute(String command) {
         ConsoleContent.append("> " + command);
         String[] strings = command.split(" ");
-
-        if (strings.length >0){
-            if (strings[0].equalsIgnoreCase("clear")){
+        if (strings.length > 0) {
+            if (strings[0].equalsIgnoreCase("clear")) {
                 ConsoleContent.clear();
-            }else if(strings[0].equalsIgnoreCase("lm")){
+            } else if (strings[0].equalsIgnoreCase("lm")) {
                 return listLogModule();
-            }else if(strings[0].equalsIgnoreCase("help")){
+            } else if (strings[0].equalsIgnoreCase("help")) {
 
-            }else if(strings[0].equalsIgnoreCase("pull")){
-                if (strings.length >= 2){
+            } else if (strings[0].equalsIgnoreCase("pull")) {
+                if (strings.length >= 2) {
                     return pullLogModule(strings[1]);
-                }else{
+                } else {
                     ConsoleContent.append("expect <module name>");
                 }
-            }else if(strings[0].equalsIgnoreCase("push")){
+            } else if (strings[0].equalsIgnoreCase("push")) {
 
             } else if (strings[0].equalsIgnoreCase("check")) {
                 return checkVar(command);
             } else {
                 ConsoleContent.append("no found " + strings[0]);
             }
-
         } else {
             ConsoleContent.append("nothing to show...");
         }
-
-
         return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), ConsoleContent.Log());
     }
 
-    private String result;
 
-
+    @Command("check")
     private NanoHTTPD.Response checkVar(String command) {
+        String result = "";
         try {
             command = command.trim();
             String[] strings = command.split(" ");
@@ -114,41 +120,39 @@ public class Command {
         return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());
     }
 
-    public NanoHTTPD.Response listLogModule() {
+
+    @Command("lm")
+    private NanoHTTPD.Response listLogModule() {
         Set<Map.Entry<String, LogModule>> list = LogManager.getInstance().getModuleDic().entrySet();
         String names = "Modules: \n";
-        for (Map.Entry<String,LogModule> entry: list){
-            names +="\t\t"+ entry.getKey()+"\n";
+        for (Map.Entry<String, LogModule> entry : list) {
+            names += "\t\t" + entry.getKey() + "\n";
         }
-
-
         ConsoleContent.append(names);
-        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),ConsoleContent.Log());
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), ConsoleContent.Log());
     }
 
 
-    public NanoHTTPD.Response pullLogModule(String moduleName){
-
+    @Command("pull")
+    private NanoHTTPD.Response pullLogModule(String moduleName) {
 
         try {
             String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
             File file = new File(filePath);
 
             FileInputStream fin = new FileInputStream(file);
-            NanoHTTPD.Response  response =  NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"log/pull?file="+moduleName);
+            NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "log/pull?file=" + moduleName);
             response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
             return response;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             ConsoleContent.append("download error: " + e.getMessage());
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
-        }catch (Exception e){
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
+        } catch (Exception e) {
             ConsoleContent.append("error: " + e.getMessage());
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
         }
-
     }
-
 
 
 }
