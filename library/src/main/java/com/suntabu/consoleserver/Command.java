@@ -52,7 +52,7 @@ public class Command {
             } else if (strings[0].equalsIgnoreCase("check")) {
                 return checkVar(command);
             } else {
-                ConsoleContent.append("no found " + strings[0]);
+                ConsoleContent.append("not found " + strings[0]);
             }
 
         } else {
