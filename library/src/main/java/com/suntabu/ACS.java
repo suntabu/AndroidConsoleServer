@@ -1,11 +1,16 @@
 package com.suntabu;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
 import com.suntabu.consoleserver.ConsoleServer;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by gouzhun on 2016/11/22.
@@ -84,4 +89,17 @@ public class ACS {
     }
     //endregion
 
+    private static Application application;
+    public static HashMap<String, Activity> clazzMap = new HashMap<>();
+    public static HashMap<String, ?> beanMap = new HashMap<>();
+    public static ArrayList<String> beanList = new ArrayList<>();
+
+    public static void setApplication(Application app) {
+        application = app;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
+    public static HashMap<String, Method> methodMap = new HashMap<>();
 }

@@ -7,6 +7,8 @@ package com.suntabu.consoleserver;
 
 import android.util.Log;
 
+import com.suntabu.ACS;
+import com.suntabu.anno.CommandProcessor;
 import com.suntabu.log.LogManager;
 
 import java.io.File;
@@ -53,7 +55,8 @@ public class Console {
         }
         mCommandRecord.add(command);
 
-        return commandHandler.handle(command);
+//        return commandHandler.handle(command);
+        return CommandProcessor.getInstance().process(command);
 
     }
 
@@ -62,7 +65,7 @@ public class Console {
         String temp1 = "";
         if (params.length == 1) {
             StringBuffer sb = new StringBuffer();
-            for (Map.Entry<String, ?> m : ConsoleServer.beanMap.entrySet()) {
+            for (Map.Entry<String, ?> m : ACS.beanMap.entrySet()) {
                 if (m.getKey().contains(params[0])) {
                     temp1 += m.getKey();
                 }

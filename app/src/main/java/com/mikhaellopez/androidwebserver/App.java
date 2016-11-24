@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
+import com.suntabu.ACS;
 import com.suntabu.consoleserver.ConsoleServer;
 
 import java.util.HashMap;
@@ -32,8 +33,8 @@ public class App extends Application {
             e.printStackTrace();
         }*/
         instance = this;
-        ConsoleServer consoleServer = new ConsoleServer(8080);
-        consoleServer.setApplication(instance);
+
+        ACS.setApplication(instance);
     }
 
 }

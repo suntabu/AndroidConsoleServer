@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.suntabu.ACS;
 import com.suntabu.consoleserver.ConsoleContent;
 import com.suntabu.consoleserver.ConsoleServer;
+import com.suntabu.log.SunLog;
 
 /**
  * Created by Mikhael LOPEZ on 14/12/2015.
@@ -59,14 +60,14 @@ public class MainActivity extends AppCompatActivity {
 
         activity = this;
 
-        Log.e("....", "onCreate:  " + this.getClass().getName());
-        ConsoleServer.clazzMap.put(getClass().getName(), this);
+        SunLog.Log("....", "onCreate:  " + this.getClass().getName());
+        ACS.clazzMap.put(getClass().getName(), this);
         t = new Temp();
         t.setAge(10);
         t.setAlive(false);
         t.setName("HEHE");
         Log.e("....", "onCreate:  " + t.getClass().getName());
-        String tt = "局部变量反射" ;
+        String tt = "局部变量反射";
         // INIT VIEW
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         editTextPort = (EditText) findViewById(R.id.editTextPort);
@@ -197,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
         if (broadcastReceiverNetworkState != null) {
             unregisterReceiver(broadcastReceiverNetworkState);
         }
+        ACS.clazzMap.remove(getClass().getName());
     }
 
 }
