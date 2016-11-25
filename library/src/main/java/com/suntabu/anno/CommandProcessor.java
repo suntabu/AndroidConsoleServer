@@ -42,6 +42,13 @@ public class CommandProcessor {
         }
     }
 
+    public void help() {
+        for (int i =0;i<registeredCommand.size();i++){
+            CommandWrapper cw = registeredCommand.get(i);
+            ConsoleContent.append(String.format("  %-15s",cw.command.value() ) + " ---" +cw.command.description());
+        }
+    }
+
     public class CommandWrapper {
         public Command command;
         public Method method;

@@ -57,7 +57,7 @@ public class Commands {
 
     @Command(value = "help", description = "command info for help")
     private void help(String[] args) {
-        ConsoleContent.clear();
+        processor.help();
     }
 
 
