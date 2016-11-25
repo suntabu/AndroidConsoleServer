@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -105,7 +106,7 @@ public class Commands {
             e.printStackTrace();
         }
         ConsoleContent.append("\n" + result + "\n");
-        return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());
+        return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mimeTypes().get("md"), "");
     }
 
 
@@ -153,5 +154,40 @@ public class Commands {
 
     }
 
+
+    @Command(value="print",description = "print activity's info by executing toString method")
+    public NanoHTTPD.Response printInfo(String[] args){
+        String result = "";
+        try {
+            for (int i = 0; i < args.length; i++) {
+                args[i].trim();
+            }
+
+            Activity activity = ConsoleContent.getActivity(args[0]);
+            if (activity!=null){
+                result = activity.toString();
+            }else{
+                ConsoleContent.append("can not find activity named " + args[0]);
+            }
+
+        } catch (ClassNotFoundException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        }
+        ConsoleContent.append("\n" + result + "\n");
+        return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mimeTypes().get("md"), "");
+    }
 
 }

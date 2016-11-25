@@ -201,4 +201,23 @@ public class MainActivity extends AppCompatActivity {
         ACS.clazzMap.remove(getClass().getName());
     }
 
+
+    @Override
+    public String toString() {
+        return "MainActivity{" +
+                "androidWebServer=" + androidWebServer +
+                ", temp='" + temp + '\'' +
+                ", staticStr='" + staticStr + '\'' +
+                ", boo=" + boo +
+                ", ch=" + ch +
+                ", lo=" + lo +
+                ", t=" + t +
+                ", broadcastReceiverNetworkState=" + broadcastReceiverNetworkState +
+                ", coordinatorLayout=" + coordinatorLayout +
+                ", editTextPort=" + editTextPort +
+                ", floatingActionButtonOnOff=" + floatingActionButtonOnOff +
+                ", textViewMessage=" + textViewMessage +
+                ", textViewIpAccess=" + textViewIpAccess +
+                '}';
+    }
 }
