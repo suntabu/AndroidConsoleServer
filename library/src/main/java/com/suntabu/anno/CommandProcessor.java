@@ -6,6 +6,7 @@ import com.suntabu.consoleserver.ConsoleContent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -29,16 +30,19 @@ public class CommandProcessor {
         Method[] ms = Commands.class.getDeclaredMethods();
         for (Method method : ms) {
             if (method.isAnnotationPresent(Command.class)) {
+                if (!method.isAccessible()) {
+                    method.setAccessible(true);
+                }
                 Command command = method.getAnnotation(Command.class);
                 if (command != null) {
-                    CommandWrapper cw = new CommandWrapper(command,method);
+                    CommandWrapper cw = new CommandWrapper(command, method);
                     registeredCommand.add(cw);
                 }
             }
         }
     }
 
-    public class CommandWrapper{
+    public class CommandWrapper {
         public Command command;
         public Method method;
 
@@ -49,26 +53,25 @@ public class CommandProcessor {
     }
 
 
-    public NanoHTTPD.Response handle(String command){
+    public NanoHTTPD.Response handle(String command) {
         CommandWrapper commandWrapper = null;
         String[] strings = command.split(" ");
-        if (strings.length > 0){
+        if (strings.length > 0) {
             String commandStr = strings[0].trim();
 
-            for (int i =0;i<registeredCommand.size();i++){
+            for (int i = 0; i < registeredCommand.size(); i++) {
                 CommandWrapper cw = registeredCommand.get(i);
-                if (cw.command.value().equalsIgnoreCase(commandStr)){
+                if (cw.command.value().equalsIgnoreCase(commandStr)) {
                     commandWrapper = cw;
 
                 }
             }
 
-            if (commandWrapper != null){
+            if (commandWrapper != null) {
                 try {
-//                   Object obj = commandWrapper.method.invoke(commandsInstance,command.replace(commandStr,"").split(" "));
-                   Object obj = commandWrapper.method.invoke(commandsInstance,command.replace(commandStr,"").split(" "));
+                    Object obj = commandWrapper.method.invoke(commandsInstance, new Object[]{command.replace(commandStr, "").trim().split(" ")});
                     NanoHTTPD.Response response = (NanoHTTPD.Response) obj;
-                    if (response!=null){
+                    if (response != null) {
                         return response;
                     }
                 } catch (IllegalAccessException e) {
@@ -76,11 +79,10 @@ public class CommandProcessor {
                 } catch (InvocationTargetException e) {
                     ConsoleContent.append(e.getMessage());
                 }
-            }else{
+            } else {
                 ConsoleContent.append("not found " + strings[0]);
             }
-        }
-        else {
+        } else {
             ConsoleContent.append("nothing to show...");
         }
 
