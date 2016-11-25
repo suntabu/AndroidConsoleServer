@@ -5,8 +5,6 @@ package com.suntabu.consoleserver;
  * Created by gouzhun on 2016/11/22.
  */
 
-import android.util.Log;
-
 import com.suntabu.ACS;
 import com.suntabu.anno.CommandProcessor;
 import com.suntabu.log.LogManager;
@@ -36,10 +34,10 @@ import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 public class Console {
     private static final int MAX_RECORD = 10;
     private ArrayList<String> mCommandRecord = new ArrayList<>();
-    private Command commandHandler;
+    private Commands commandsHandler;
 
     public Console() {
-        commandHandler = new Command();
+        commandsHandler = new Commands();
     }
 
     public Response console_out(IHTTPSession session) {
@@ -55,47 +53,12 @@ public class Console {
         }
         mCommandRecord.add(command);
 
-//        return commandHandler.handle(command);
-        return CommandProcessor.getInstance().process(command);
+        return commandsHandler.handle(command);
+//        return CommandProcessor.getInstance().process(command);
 
     }
 
-    //TODO
-    private String processField(Object o, String... params) throws ClassNotFoundException, NoSuchFieldException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        String temp1 = "";
-        if (params.length == 1) {
-            StringBuffer sb = new StringBuffer();
-            for (Map.Entry<String, ?> m : ACS.beanMap.entrySet()) {
-                if (m.getKey().contains(params[0])) {
-                    temp1 += m.getKey();
-                }
-            }
 
-            Class clazz = Class.forName(temp1);
-            Field[] fields = clazz.getDeclaredFields();
-            for (Field f : fields) {
-                String name = f.getName();
-                name = name.substring(0, 1).toUpperCase() + name.substring(1);
-                Method m = clazz.getDeclaredMethod("get" + name);
-                String value = (String) m.invoke(clazz);
-                sb.append(f.getName() + " = " + value + "\n");
-            }
-            return new String(sb);
-        }
-
-        if (o instanceof String) {
-            return (String) o;
-        } else if (o instanceof List) {
-
-        } else if (o instanceof HashMap) {
-
-        } else if (o instanceof Array) {
-
-        } else {
-            return o.toString();
-        }
-        return "";
-    }
 
     public Response console_history(IHTTPSession session) {
         int index = Integer.parseInt(session.getParms().get("index"));

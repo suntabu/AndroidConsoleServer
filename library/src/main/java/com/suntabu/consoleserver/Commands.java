@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.util.Log;
 
 import com.suntabu.ACS;
+import com.suntabu.anno.CommandProcessor;
 import com.suntabu.log.LogManager;
 import com.suntabu.log.LogModule;
 
@@ -23,52 +24,46 @@ import fi.iki.elonen.NanoHTTPD;
 
 import static fi.iki.elonen.NanoHTTPD.mimeTypes;
 import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
-
+import com.suntabu.anno.Command;
 /**
  * Created by gouzhun on 2016/11/22.
  */
 
-public class Command {
-    private static final String TAG = "Command";
+public class Commands {
+    private static final String TAG = "Commands";
+    private CommandProcessor processor;
+
+
+    public Commands(){
+        processor = new CommandProcessor(this);
+    }
+
+
 
     public NanoHTTPD.Response handle(String command){
         ConsoleContent.append("> " + command);
-        String[] strings = command.split(" ");
-
-        if (strings.length >0){
-            if (strings[0].equalsIgnoreCase("clear")){
-                ConsoleContent.clear();
-            }else if(strings[0].equalsIgnoreCase("lm")){
-                return listLogModule();
-            }else if(strings[0].equalsIgnoreCase("help")){
-
-            }else if(strings[0].equalsIgnoreCase("pull")){
-                if (strings.length >= 2){
-                    return pullLogModule(strings[1]);
-                }else{
-                    ConsoleContent.append("expect <module name>");
-                }
-            }else if(strings[0].equalsIgnoreCase("push")){
-
-            } else if (strings[0].equalsIgnoreCase("check")) {
-                return checkVar(command);
-            } else {
-                ConsoleContent.append("not found " + strings[0]);
-            }
-
-        } else {
-            ConsoleContent.append("nothing to show...");
-        }
 
 
-        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), ConsoleContent.Log());
+        return processor.handle(command);
     }
 
-    private String result;
+
+    @Command(value = "clear", description = "clear console")
+    private void clearConsole(){
+        ConsoleContent.clear();
+    }
+
+    @Command(value = "help", description = "command info for help")
+    private void help(){
+        ConsoleContent.clear();
+    }
 
 
+    @Command(value = "check", description = "check methods or fields")
     private NanoHTTPD.Response checkVar(String command) {
+        String result = "";
         try {
+
             command = command.trim();
             String[] strings = command.split(" ");
             for (int i = 0; i < strings.length; i++) {
@@ -114,6 +109,8 @@ public class Command {
         return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mimeTypes().get("md"), ConsoleContent.Log());
     }
 
+
+    @Command(value = "lm", description = "list module names")
     public NanoHTTPD.Response listLogModule() {
         Set<Map.Entry<String, LogModule>> list = LogManager.getInstance().getModuleDic().entrySet();
         String names = "Modules: \n";
@@ -127,17 +124,25 @@ public class Command {
     }
 
 
-    public NanoHTTPD.Response pullLogModule(String moduleName){
+    @Command(value = "pull", description = "pull module log")
+    public NanoHTTPD.Response pullLogModule(String[] args){
 
 
         try {
-            String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
-            File file = new File(filePath);
+            if (args.length >=1){
+                String moduleName = args[0];
+                String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
+                File file = new File(filePath);
 
-            FileInputStream fin = new FileInputStream(file);
-            NanoHTTPD.Response  response =  NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"log/pull?file="+moduleName);
-            response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
-            return response;
+                FileInputStream fin = new FileInputStream(file);
+                NanoHTTPD.Response  response =  NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"log/pull?file="+moduleName);
+                response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
+                return response;
+            }else{
+                ConsoleContent.append("expect <module name>");
+                return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"");
+            }
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             ConsoleContent.append("download error: " + e.getMessage());
