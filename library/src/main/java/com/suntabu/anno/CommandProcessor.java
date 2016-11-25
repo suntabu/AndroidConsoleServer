@@ -65,6 +65,7 @@ public class CommandProcessor {
 
             if (commandWrapper != null){
                 try {
+//                   Object obj = commandWrapper.method.invoke(commandsInstance,command.replace(commandStr,"").split(" "));
                    Object obj = commandWrapper.method.invoke(commandsInstance,command.replace(commandStr,"").split(" "));
                     NanoHTTPD.Response response = (NanoHTTPD.Response) obj;
                     if (response!=null){

@@ -116,6 +116,7 @@ public class ConsoleServer extends NanoHTTPD {
             ConsoleContent.append(nfe.getMessage());
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found " + nfe.getMessage());
         } catch (Exception ex) {
+            ConsoleContent.append(ex.getMessage());
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_HTML, "<html><body><h1>Error</h1>" + ex.toString() + "</body></html>");
         }
     }

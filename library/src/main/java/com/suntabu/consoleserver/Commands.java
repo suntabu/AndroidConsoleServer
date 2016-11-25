@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,9 @@ import fi.iki.elonen.NanoHTTPD;
 
 import static fi.iki.elonen.NanoHTTPD.mimeTypes;
 import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
+
 import com.suntabu.anno.Command;
+
 /**
  * Created by gouzhun on 2016/11/22.
  */
@@ -34,13 +37,12 @@ public class Commands {
     private CommandProcessor processor;
 
 
-    public Commands(){
+    public Commands() {
         processor = new CommandProcessor(this);
     }
 
 
-
-    public NanoHTTPD.Response handle(String command){
+    public NanoHTTPD.Response handle(String command) {
         ConsoleContent.append("> " + command);
 
 
@@ -49,44 +51,41 @@ public class Commands {
 
 
     @Command(value = "clear", description = "clear console")
-    private void clearConsole(){
+    private void clearConsole(String[] args) {
         ConsoleContent.clear();
     }
 
     @Command(value = "help", description = "command info for help")
-    private void help(){
+    private void help(String[] args) {
         ConsoleContent.clear();
     }
 
 
     @Command(value = "check", description = "check methods or fields")
-    private NanoHTTPD.Response checkVar(String command) {
+    private NanoHTTPD.Response checkVar(String[] args) {
         String result = "";
         try {
-
-            command = command.trim();
-            String[] strings = command.split(" ");
-            for (int i = 0; i < strings.length; i++) {
-                strings[i].trim();
-                Log.e(TAG, "checkVar:" + strings[i].trim());
+            for (int i = 0; i < args.length; i++) {
+                args[i].trim();
+                Log.e(TAG, "checkVar:" + args[i].trim());
             }
             for (Map.Entry<String, Activity> entry : ACS.clazzMap.entrySet()) {
-                if (entry.getKey().contains(strings[1])) {
+                if (entry.getKey().contains(args[0])) {
                     Class clazz = Class.forName(entry.getKey());
-                    String last = strings[strings.length - 1];
+                    String last = args[args.length - 1];
 //                    String lastTemp = last.substring(last.indexOf("(") + 1, last.indexOf(")"));
-                    if (command.contains("-m")) {
-                        java.lang.reflect.Method method = clazz.getDeclaredMethod(strings[2]);
+                    if (Arrays.asList(args).contains("-m")) {
+                        java.lang.reflect.Method method = clazz.getDeclaredMethod(args[2]);
 
                     } else {
-                        Field field = clazz.getDeclaredField(strings[2]);
+                        Field field = clazz.getDeclaredField(args[1]);
                         field.setAccessible(true);
 //                        result = processField(field.get(entry.getValue()), lastTemp);
                         Object o = field.get(entry.getValue());
                         if (o instanceof String) {
-                            result = strings[2] + " = " + o;
+                            result = args[1] + " = " + o;
                         } else {
-                            result = strings[2] + " = " + o.toString();
+                            result = args[1] + " = " + o.toString();
                         }
 
                     }
@@ -111,49 +110,48 @@ public class Commands {
 
 
     @Command(value = "lm", description = "list module names")
-    public NanoHTTPD.Response listLogModule() {
+    public NanoHTTPD.Response listLogModule(String[] args) {
         Set<Map.Entry<String, LogModule>> list = LogManager.getInstance().getModuleDic().entrySet();
         String names = "Modules: \n";
-        for (Map.Entry<String,LogModule> entry: list){
-            names +="\t\t"+ entry.getKey()+"\n";
+        for (Map.Entry<String, LogModule> entry : list) {
+            names += "\t\t" + entry.getKey() + "\n";
         }
 
 
         ConsoleContent.append(names);
-        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),ConsoleContent.Log());
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), ConsoleContent.Log());
     }
 
 
     @Command(value = "pull", description = "pull module log")
-    public NanoHTTPD.Response pullLogModule(String[] args){
+    public NanoHTTPD.Response pullLogModule(String[] args) {
 
 
         try {
-            if (args.length >=1){
+            if (args.length >= 1) {
                 String moduleName = args[0];
                 String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
                 File file = new File(filePath);
 
                 FileInputStream fin = new FileInputStream(file);
-                NanoHTTPD.Response  response =  NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"log/pull?file="+moduleName);
+                NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "log/pull?file=" + moduleName);
                 response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
                 return response;
-            }else{
+            } else {
                 ConsoleContent.append("expect <module name>");
-                return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),"");
+                return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "");
             }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             ConsoleContent.append("download error: " + e.getMessage());
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
-        }catch (Exception e){
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
+        } catch (Exception e) {
             ConsoleContent.append("error: " + e.getMessage());
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK,NanoHTTPD.mimeTypes().get("md"),e.getMessage());
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
         }
 
     }
-
 
 
 }
