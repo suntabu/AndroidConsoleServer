@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,9 @@ import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 
 import com.suntabu.anno.Command;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by gouzhun on 2016/11/22.
  */
@@ -36,7 +40,7 @@ import com.suntabu.anno.Command;
 public class Commands {
     private static final String TAG = "Commands";
     private CommandProcessor processor;
-
+    private static final int JSON_INDENT = 2;
 
     public Commands() {
         processor = new CommandProcessor(this);
@@ -155,20 +159,40 @@ public class Commands {
     }
 
 
-    @Command(value="print",description = "print activity's info by executing toString method")
+    @Command(value="print",description = "print activity's info by executing toString method  (with -f to format json str)")
     public NanoHTTPD.Response printInfo(String[] args){
         String result = "";
+        boolean isFormat = false;
         try {
+            ArrayList<String> ars = new ArrayList<>();
             for (int i = 0; i < args.length; i++) {
-                args[i].trim();
+                args[i] =  args[i].trim();
+
+                if (args[i].contains("-f")){
+                    isFormat = true;
+                }else{
+                    ars.add(args[i]);
+                }
+
             }
 
-            Activity activity = ConsoleContent.getActivity(args[0]);
-            if (activity!=null){
-                result = activity.toString();
+
+
+            if (ars.size() >=1){
+                Activity activity = ConsoleContent.getActivity(ars.get(0));
+                if (activity!=null){
+                    result = activity.toString();
+
+                    if (isFormat){
+                        result =result.replace(" ","\n");
+                    }
+                }else{
+                    ConsoleContent.append("can not find activity named " + args[0]);
+                }
             }else{
-                ConsoleContent.append("can not find activity named " + args[0]);
+                ConsoleContent.append("expect <Activity Name>");
             }
+
 
         } catch (ClassNotFoundException e) {
             ConsoleContent.append(e.getMessage());
