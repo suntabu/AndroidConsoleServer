@@ -59,9 +59,9 @@ public class MainActivity extends AppCompatActivity {
         ACS.init(this);
         ACS.registerKey("Util");
         activity = this;
-//        SunLog.Log("....", this.getClass().getName());
+        SunLog.Log("....", this.getClass().getName());
         Util.ULog("....", getClass().getName());
-        ACS.clazzMap.put(getClass().getName(), this);
+        ACS.clazzMap.put(getClass().getName(), this);  //
         t = new Temp();
         t.setAge(10);
         t.setAlive(false);

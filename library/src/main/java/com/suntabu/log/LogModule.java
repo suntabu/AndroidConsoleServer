@@ -40,7 +40,7 @@ public class LogModule {
 
         String format = "[%s] : %s";
 
-        String content = String.format(format, new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()), msg + " " + callMethodAndLine());
+        String content = String.format(format, new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()) , String.format(" %-40s", callMethodAndLine()) + msg);
 
         ConsoleContent.append(content);
 
