@@ -6,7 +6,6 @@ import com.suntabu.consoleserver.ConsoleContent;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -43,9 +42,9 @@ public class CommandProcessor {
     }
 
     public void help() {
-        for (int i =0;i<registeredCommand.size();i++){
+        for (int i = 0; i < registeredCommand.size(); i++) {
             CommandWrapper cw = registeredCommand.get(i);
-            ConsoleContent.append(String.format("  %-15s",cw.command.value() ) + " ---" +cw.command.description());
+            ConsoleContent.append(String.format("  %-15s", cw.command.value()) + " ---" + cw.command.description());
         }
     }
 

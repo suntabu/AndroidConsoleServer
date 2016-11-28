@@ -36,4 +36,14 @@ public class Temp {
         this.alive = alive;
     }
 
+
+    @Override
+    public String toString() {
+        return "Temp{" +
+                "age=" + age +
+                ", name='" + name + '\'' +
+                ", alive=" + alive +
+                '}';
+    }
+
 }
