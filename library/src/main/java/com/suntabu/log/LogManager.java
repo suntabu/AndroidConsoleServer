@@ -19,7 +19,7 @@ public class LogManager {
         return mInstance;
     }
 
-    public HashMap<String,LogModule> getModuleDic() {
+    public HashMap<String, LogModule> getModuleDic() {
         return mModuleDic;
     }
 
@@ -39,7 +39,7 @@ public class LogManager {
     public boolean IsAllEnable = true;
     public boolean IsLogFileEnable = true;
     public boolean IsLogConsoleEnable = true;
-
+    public String key = "";
     private HashMap<String, LogModule> mModuleDic;
 
     public void Log(String moduleName, String msg) {

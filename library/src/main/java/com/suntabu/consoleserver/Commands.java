@@ -66,8 +66,7 @@ public class Commands {
         String result = "";
         try {
             for (int i = 0; i < args.length; i++) {
-                args[i].trim();
-                Log.e(TAG, "checkVar:" + args[i].trim());
+                args[i] = args[i].trim();
             }
             for (Map.Entry<String, Activity> entry : ACS.clazzMap.entrySet()) {
                 if (entry.getKey().contains(args[0])) {

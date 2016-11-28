@@ -1,5 +1,6 @@
 package com.suntabu.log;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.suntabu.consoleserver.ConsoleContent;
@@ -24,7 +25,7 @@ public class LogModule {
     }
 
 
-    public String getParentPath(){
+    public String getParentPath() {
         String folder = LogManager.getInstance().getLogPath() + "/" + moduleName;
         new File(folder).mkdirs();
         return folder;
@@ -39,8 +40,7 @@ public class LogModule {
 
         String format = "[%s] : %s";
 
-
-        String content = String.format(format, new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()), msg + " ");
+        String content = String.format(format, new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()), msg + " " + callMethodAndLine());
 
         ConsoleContent.append(content);
 
@@ -52,8 +52,8 @@ public class LogModule {
         if (LogManager.getInstance().IsLogFileEnable) {
             FileWriter fw = null;
             try {
-                fw = new FileWriter(getFilePath(),true);
-                fw.write("\n"+content);
+                fw = new FileWriter(getFilePath(), true);
+                fw.write("\n" + content);
                 fw.close();
             } catch (IOException e) {
                 Log.i(moduleName, e.getMessage());
@@ -61,6 +61,42 @@ public class LogModule {
 
         }
 
-
     }
+
+
+    private static String callMethodAndLine() {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        for (int i = 0; i < stackTrace.length - 1; i++) {
+            StackTraceElement targetElement = stackTrace[i];
+            String className = targetElement.getClassName();
+            if (className.contains("SunLog")) {
+                if (i + 1 < stackTrace.length) {
+                    StackTraceElement stackElement = stackTrace[i + 1];
+                    String myClass = stackElement.getClassName();
+                    if (!TextUtils.isEmpty(LogManager.getInstance().key) && myClass.contains(LogManager.getInstance().key)) {
+                        stackElement = stackTrace[i + 2];
+                        myClass = stackElement.getClassName();
+                    }
+
+                    String[] classNameInfo = myClass.split("\\.");
+                    if (classNameInfo.length > 0) {
+                        myClass = classNameInfo[classNameInfo.length - 1] + ".java";
+                    }
+                    if (myClass.contains("$")) {
+                        myClass = myClass.split("\\$")[0] + ".java";
+                    }
+                    String methodName = stackElement.getMethodName();
+                    int lineNumber = stackElement.getLineNumber();
+                    if (lineNumber < 0) {
+                        lineNumber = 0;
+                    }
+                    String headString = "(" + myClass + ":" + lineNumber + ")";
+                    return headString;
+                }
+            }
+        }
+        return "";
+    }
+
+
 }

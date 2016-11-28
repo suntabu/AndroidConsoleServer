@@ -57,10 +57,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ACS.init(this);
-
+        ACS.registerKey("Util");
         activity = this;
-
-        SunLog.Log("....", "onCreate:  " + this.getClass().getName());
+//        SunLog.Log("....", this.getClass().getName());
+        Util.ULog("....", getClass().getName());
         ACS.clazzMap.put(getClass().getName(), this);
         t = new Temp();
         t.setAge(10);

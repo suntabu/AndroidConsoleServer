@@ -6,6 +6,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.suntabu.consoleserver.ConsoleServer;
+import com.suntabu.log.LogManager;
+import com.suntabu.log.LogModule;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -14,11 +16,9 @@ import java.util.HashMap;
 
 /**
  * Created by gouzhun on 2016/11/22.
- *
- *
+ * <p>
+ * <p>
  * ACS(Android console server) api class
- *
- *
  */
 
 public class ACS {
@@ -28,28 +28,33 @@ public class ACS {
     private static int port = 8443;
     private static ConsoleServer consoleServer;
 
-//TODO: wifi_state_changed and network_changed broadcast callback for server
-    public static void init(Context ctx){
+    //TODO: wifi_state_changed and network_changed broadcast callback for server
+    public static void init(Context ctx) {
         context = ctx;
+
     }
 
 
     /**
-     *
      * @param ctx
-     * @param pt listen port on
+     * @param pt  listen port on
      */
-    public static void init(Context ctx,int pt){
+    public static void init(Context ctx, int pt) {
         init(context);
         port = pt;
     }
 
-
-    public static Context getContext(){
-        return context;
+    /**
+     * 如果想再封装一次Log方法,需要注册你的包装类的类名
+     * @param key
+     */
+    public static void registerKey(String key) {
+        LogManager.getInstance().key = key;
     }
 
-
+    public static Context getContext() {
+        return context;
+    }
 
 
     public static boolean mkdir(File file) {
@@ -73,7 +78,7 @@ public class ACS {
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.e("Server","The PORT " + port + " doesn't work, please change it between 1000 and 9999.");
+                Log.e("Server", "The PORT " + port + " doesn't work, please change it between 1000 and 9999.");
             }
         }
         return false;
@@ -87,6 +92,8 @@ public class ACS {
         }
         return false;
     }
+
+
     //endregion
 
     private static Application application;
@@ -101,5 +108,6 @@ public class ACS {
     public Application getApplication() {
         return application;
     }
+
     public static HashMap<String, Method> methodMap = new HashMap<>();
 }
