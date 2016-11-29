@@ -48,7 +48,6 @@ public class LogModule {
             Log.i(moduleName, content);
         }
 
-
         if (LogManager.getInstance().IsLogFileEnable) {
             FileWriter fw = null;
             try {
@@ -58,7 +57,6 @@ public class LogModule {
             } catch (IOException e) {
                 Log.i(moduleName, e.getMessage());
             }
-
         }
 
     }
