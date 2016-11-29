@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         ACS.init(this);
         ACS.registerKey("Util");
         activity = this;
-        SunLog.Log("....", this.getClass().getName());
+        SunLog.Log("....", this.getClass().getName() + "\n[{\"id\":\"101\",\"isOpen\":\"1\",\"next\":\"0\",\"description\":\"\\u7b7e\\u5230\",\"type\":\"1\",\"num\":\"1\",\"rewardDescription\":\"50\\u7ecf\\u9a8c\\uff0c\\u793c\\u7269\\u9053\\u5177A\",\"reward\":[{\"id\":2,\"type\":1,\"num\":50},{\"id\":101,\"type\":2,\"num\":1}]},"  );
         Util.ULog("....", getClass().getName());
         ACS.clazzMap.put(getClass().getName(), this);  //
         t = new Temp();
