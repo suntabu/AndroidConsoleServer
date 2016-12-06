@@ -4,7 +4,9 @@
  
  Using a NanoHTTPD Server on app side for serving the console command and request.
  
- 
+ - TODO:
+ -- 1. list external app directory infos
+ -- 2. clear external app directory files
 
 LICENCE
 -----
