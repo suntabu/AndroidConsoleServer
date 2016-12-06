@@ -4,22 +4,18 @@ import android.app.Activity;
 import android.util.Log;
 
 import com.suntabu.ACS;
+import com.suntabu.anno.Command;
 import com.suntabu.anno.CommandProcessor;
 import com.suntabu.log.LogManager;
 import com.suntabu.log.LogModule;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,11 +23,7 @@ import fi.iki.elonen.NanoHTTPD;
 
 import static fi.iki.elonen.NanoHTTPD.mimeTypes;
 import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
-
-import com.suntabu.anno.Command;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import static java.lang.System.in;
 
 /**
  * Created by gouzhun on 2016/11/22.
@@ -127,29 +119,83 @@ public class Commands {
     }
 
 
-    @Command(value = "pull", description = "pull module log")
+    @Command(value = "ls", description = "list: \n\t\t\t --  -i internal cache directory.\n\t\t\t --  -e external directory")
+    public NanoHTTPD.Response listDirecotry(String[] args) {
+        String names = "files: \n";
+        for (int i = 0; i < args.length; i++) {
+            args[i] = args[i].trim();
+        }
+
+        if (Arrays.asList(args).contains("-e")){
+
+        }
+
+        if (Arrays.asList(args).contains("-i")){
+            File fileDir = ACS.getContext().getCacheDir();
+            names += ConsoleContent.printDirecotry(fileDir,"\n\t\t");
+        }
+
+        ConsoleContent.append(names);
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), ConsoleContent.Log());
+    }
+
+    @Command(value = "la", description = "list all activities")
+    public NanoHTTPD.Response listActivities(String[] args) {
+
+        String names = "Activities: \n";
+        Map activities = null;
+        try {
+            activities = ConsoleContent.getActivities();
+            for (Object activityRecord : activities.values()) {
+                Class activityRecordClass = activityRecord.getClass();
+                Field activityField = activityRecordClass.getDeclaredField("activity");
+                activityField.setAccessible(true);
+                Activity activity = (Activity) activityField.get(activityRecord);
+                names += "\t\t" + "  " + activity.getPackageCodePath() + "  " + activity.getClass().getName() + "\n";
+            }
+        } catch (ClassNotFoundException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            ConsoleContent.append(e.getMessage());
+            e.printStackTrace();
+        }
+
+        ConsoleContent.append(names);
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), ConsoleContent.Log());
+    }
+
+
+    @Command(value = "pull", description = "pull module log or file")
     public NanoHTTPD.Response pullLogModule(String[] args) {
-
-
         try {
             if (args.length >= 1) {
-                String moduleName = args[0];
-                String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
-                File file = new File(filePath);
+                String arg = args[0];
+                NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "log/pull?file=" + arg);
 
-                FileInputStream fin = new FileInputStream(file);
-                NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "log/pull?file=" + moduleName);
-                response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
+                if (LogManager.getInstance().getModuleDic().containsKey(arg)){
+                    String filePath = LogManager.getInstance().getModuleDic().get(arg).getFilePath();
+                    File file = new File(filePath);
+                    response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
+                }else{
+                    response.addHeader("Content-disposition", String.format("attachment; filename=%s", arg));
+                }
+
                 return response;
             } else {
                 ConsoleContent.append("expect <module name>");
                 return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "");
             }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            ConsoleContent.append("download error: " + e.getMessage());
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
         } catch (Exception e) {
             ConsoleContent.append("error: " + e.getMessage());
             return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
@@ -158,37 +204,36 @@ public class Commands {
     }
 
 
-    @Command(value="print",description = "print activity's info by executing toString method  (with -f to format json str)")
-    public NanoHTTPD.Response printInfo(String[] args){
+    @Command(value = "print", description = "print activity's info by executing toString method  (with -f to format json str)")
+    public NanoHTTPD.Response printInfo(String[] args) {
         String result = "";
         boolean isFormat = false;
         try {
             ArrayList<String> ars = new ArrayList<>();
             for (int i = 0; i < args.length; i++) {
-                args[i] =  args[i].trim();
+                args[i] = args[i].trim();
 
-                if (args[i].contains("-f")){
+                if (args[i].contains("-f")) {
                     isFormat = true;
-                }else{
+                } else {
                     ars.add(args[i]);
                 }
 
             }
 
 
-
-            if (ars.size() >=1){
+            if (ars.size() >= 1) {
                 Activity activity = ConsoleContent.getActivity(ars.get(0));
-                if (activity!=null){
+                if (activity != null) {
                     result = activity.toString();
 
-                    if (isFormat){
-                        result =result.replace(" ","\n");
+                    if (isFormat) {
+                        result = result.replace(" ", "\n");
                     }
-                }else{
+                } else {
                     ConsoleContent.append("can not find activity named " + args[0]);
                 }
-            }else{
+            } else {
                 ConsoleContent.append("expect <Activity Name>");
             }
 

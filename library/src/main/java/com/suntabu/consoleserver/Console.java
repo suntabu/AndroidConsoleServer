@@ -5,25 +5,12 @@ package com.suntabu.consoleserver;
  * Created by gouzhun on 2016/11/22.
  */
 
-import com.suntabu.ACS;
-import com.suntabu.anno.CommandProcessor;
 import com.suntabu.log.LogManager;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;
 
@@ -59,7 +46,6 @@ public class Console {
     }
 
 
-
     public Response console_history(IHTTPSession session) {
         int index = Integer.parseInt(session.getParms().get("index"));
 
@@ -86,21 +72,17 @@ public class Console {
 
 
     public Response log_pull(IHTTPSession session) {
-        String moduleName = session.getParms().get("file");
-
-
-        String filePath = LogManager.getInstance().getModuleDic().get(moduleName).getFilePath();
-        File file = new File(filePath);
-        try {
-            ConsoleContent.append("download... " + filePath);
-            FileInputStream fin = new FileInputStream(file);
-            NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/octet-stream", fin, file.length());
-            response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
-            return response;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            ConsoleContent.append("download error: " + e.getMessage());
-            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
+        String filePara = session.getParms().get("file");
+        String filePath = "";
+        if (LogManager.getInstance().getModuleDic().containsKey(filePara)) {
+            filePath = LogManager.getInstance().getModuleDic().get(filePara).getFilePath();
+        } else {
+            filePath = filePara;
         }
+
+
+        return ConsoleContent.getDownloadFileResponse(filePath);
     }
+
+
 }
