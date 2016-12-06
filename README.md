@@ -1,12 +1,13 @@
  
  
  
+ [image](https://coding.net/u/suntabu/p/AndroidConsoleServer/git/blob/master/help.png)
  
  Using a NanoHTTPD Server on app side for serving the console command and request.
  
  - TODO:
- -- 1. list external app directory infos
- -- 2. clear external app directory files
+ 	- 1. list external app directory infos
+ -	- 2. clear external app directory files
 
 LICENCE
 -----
