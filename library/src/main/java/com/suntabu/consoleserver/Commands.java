@@ -1,6 +1,7 @@
 package com.suntabu.consoleserver;
 
 import android.app.Activity;
+import android.os.Environment;
 import android.util.Log;
 
 import com.suntabu.ACS;
@@ -10,8 +11,6 @@ import com.suntabu.log.LogManager;
 import com.suntabu.log.LogModule;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -23,7 +22,6 @@ import fi.iki.elonen.NanoHTTPD;
 
 import static fi.iki.elonen.NanoHTTPD.mimeTypes;
 import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
-import static java.lang.System.in;
 
 /**
  * Created by gouzhun on 2016/11/22.
@@ -119,20 +117,26 @@ public class Commands {
     }
 
 
-    @Command(value = "ls", description = "list: \n\t\t\t --  -i internal cache directory.\n\t\t\t --  -e external directory")
+    @Command(value = "ls", description = "list: \n\t\t\t --  -i cache directory.(context.getCacheDir() and context.getExternalCacheDir() )\n\t\t\t --  -e custom use external directory")
     public NanoHTTPD.Response listDirecotry(String[] args) {
         String names = "files: \n";
         for (int i = 0; i < args.length; i++) {
             args[i] = args[i].trim();
         }
 
-        if (Arrays.asList(args).contains("-e")){
+        if (Arrays.asList(args).contains("-e")) {
 
         }
 
-        if (Arrays.asList(args).contains("-i")){
+        if (Arrays.asList(args).contains("-i")) {
+            names += "\ninternal cached files: \n";
             File fileDir = ACS.getContext().getCacheDir();
-            names += ConsoleContent.printDirecotry(fileDir,"\n\t\t");
+            names += ConsoleContent.printDirecotry(fileDir, "\n\t\t");
+
+            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                names += "\nexternal cached files: \n";
+                names += ConsoleContent.printDirecotry(ACS.getContext().getExternalCacheDir(), "\n\t\t");
+            }
         }
 
         ConsoleContent.append(names);
@@ -182,11 +186,11 @@ public class Commands {
                 String arg = args[0];
                 NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "log/pull?file=" + arg);
 
-                if (LogManager.getInstance().getModuleDic().containsKey(arg)){
+                if (LogManager.getInstance().getModuleDic().containsKey(arg)) {
                     String filePath = LogManager.getInstance().getModuleDic().get(arg).getFilePath();
                     File file = new File(filePath);
                     response.addHeader("Content-disposition", String.format("attachment; filename=%s", file.getName()));
-                }else{
+                } else {
                     response.addHeader("Content-disposition", String.format("attachment; filename=%s", arg));
                 }
 
@@ -201,6 +205,18 @@ public class Commands {
             return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
         }
 
+    }
+
+    @Command(value = "cc", description = "clear cache")
+    public NanoHTTPD.Response clearCache(String[] args) {
+        try {
+            ConsoleContent.clearAllCache(ACS.getContext());
+            ConsoleContent.append("\t\tdone!");
+        } catch (Exception e) {
+            ConsoleContent.append("error: " + e.getMessage());
+            return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), e.getMessage());
+        }
+        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, NanoHTTPD.mimeTypes().get("md"), "");
     }
 
 

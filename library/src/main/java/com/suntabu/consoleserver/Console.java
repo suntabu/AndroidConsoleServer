@@ -35,7 +35,7 @@ public class Console {
     public Response console_run(IHTTPSession session) throws UnsupportedEncodingException {
         String command = session.getParms().get("command");
         command = URLDecoder.decode(command, "UTF-8");
-        if (mCommandRecord.size() >= 10) {
+        if (mCommandRecord.size() >= MAX_RECORD) {
             mCommandRecord.remove(0);
         }
         mCommandRecord.add(command);
@@ -66,7 +66,6 @@ public class Console {
 
 
     public Response console_complete(IHTTPSession session) {
-
         return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), "");
     }
 
