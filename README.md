@@ -1,7 +1,7 @@
  
  
  
- [image](https://coding.net/u/suntabu/p/AndroidConsoleServer/git/blob/master/help.png)
+ ![](https://coding.net/u/suntabu/p/AndroidConsoleServer/git/raw/master/help.png)
  
  Using a NanoHTTPD Server on app side for serving the console command and request.
  
