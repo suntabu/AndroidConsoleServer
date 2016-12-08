@@ -1,1 +1,1 @@
-include ':app', ':library', ':hostapp'
+include ':app', ':library', ':hostapp', ':config'

@@ -36,6 +36,7 @@ dependencies {
 
 
     compile 'org.nanohttpd:nanohttpd:2.2.0'
+    compile project(':config')
 }
 
 

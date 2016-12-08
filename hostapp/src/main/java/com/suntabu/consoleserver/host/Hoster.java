@@ -1,6 +1,7 @@
 package com.suntabu.consoleserver.host;
 
 import com.google.gson.Gson;
+import com.suntabu.consoleserver.config.Config;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -16,10 +17,6 @@ import fi.iki.elonen.NanoHTTPD;
 public class Hoster extends NanoHTTPD {
 
 
-    public static final String SERVERIP = "255.255.255.255";
-    public static final int SERVERPORT = 11000;
-    public static final Long RECV_INTERVAL = 100L;
-    public static final Long SEND_INTERVAL = 2000L;
     static DatagramSocket socket = null;
 
     private HashMap<String, PacketObj> devices = new HashMap<>();
@@ -33,13 +30,13 @@ public class Hoster extends NanoHTTPD {
                 public void run() {
 
                     try {
-                        InetAddress serverAddress = InetAddress.getByName(SERVERIP);
+                        InetAddress serverAddress = InetAddress.getByName(Config.SERVERIP);
                         System.out.println("Client: Start connecting\n");
-                        socket = new DatagramSocket(SERVERPORT);
+                        socket = new DatagramSocket(Config.SERVERPORT);
                         String url = "hello Nano";
                         byte[] buf = url.getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length,
-                                serverAddress, SERVERPORT);
+                                serverAddress, Config.SERVERPORT);
                         socket.send(packet);
                         System.out.println("Client: sent Succeed!\n");
 
@@ -49,7 +46,7 @@ public class Hoster extends NanoHTTPD {
                             DatagramPacket recpacket = new DatagramPacket(recbuf, recbuf.length);
                             try {
                                 socket.receive(recpacket);
-                                Thread.sleep(RECV_INTERVAL);
+                                Thread.sleep(Config.RECV_INTERVAL);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } catch (InterruptedException e) {
@@ -91,7 +88,7 @@ public class Hoster extends NanoHTTPD {
                 public void run() {
                     while (true) {
                         try {
-                            Thread.sleep(SEND_INTERVAL + SEND_INTERVAL);
+                            Thread.sleep(Config.SEND_INTERVAL * 2);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -117,9 +114,9 @@ public class Hoster extends NanoHTTPD {
 
 
     public Hoster() throws IOException {
-        super(8080);
+        super(Config.HTTP_PORT);
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-        System.out.println("\nRunning! Point your browsers to http://localhost:8080/ \n");
+        System.out.println("\nRunning! Point your browsers to http://localhost:"+Config.HTTP_PORT+"/ \n");
     }
 
 

@@ -3,6 +3,7 @@ package com.suntabu.consoleserver;
 import android.content.res.Resources;
 
 import com.suntabu.ACS;
+import com.suntabu.consoleserver.config.Config;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -132,10 +133,7 @@ public class ConsoleServer extends NanoHTTPD {
         }
     }
 
-    // UDP广播IP和PORT
-    public static final String SERVERIP = "255.255.255.255";
-    public static final int SERVERPORT = 11000;
-    public static final Long INTERVAL = 2000L;
+
     DatagramSocket socket = null;
 
     @Override
@@ -147,9 +145,9 @@ public class ConsoleServer extends NanoHTTPD {
             public void run() {
                 // 向局域网UDP广播信息：Hello, World!
                 try {
-                    InetAddress serverAddress = InetAddress.getByName(SERVERIP);
+                    InetAddress serverAddress = InetAddress.getByName(Config.SERVERIP);
                     System.out.println("Client: Start connecting\n");
-                    socket = new DatagramSocket(SERVERPORT);
+                    socket = new DatagramSocket(Config.SERVERPORT);
                     while (true) {
                         String url = ACS.getIpAccess() + port;
                         JSONObject jo = new JSONObject();
@@ -159,12 +157,11 @@ public class ConsoleServer extends NanoHTTPD {
 
                         byte[] buf = jo.toString().getBytes();
                         DatagramPacket packet = new DatagramPacket(buf, buf.length,
-                                serverAddress, SERVERPORT);
-//                        System.out.println("Client: Sending ‘" + new String(buf)                                + "’\n");
+                                serverAddress, Config.SERVERPORT);
                         socket.send(packet);
                         System.out.println("Client: sent Succeed!\n");
 
-                        Thread.sleep(INTERVAL);
+                        Thread.sleep(Config.SEND_INTERVAL);
                     }
 
                 } catch (UnknownHostException e) {
@@ -178,21 +175,7 @@ public class ConsoleServer extends NanoHTTPD {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                // 接收UDP广播，有的手机不支持
-//                while (true) {
-//                    byte[] recbuf = new byte[255];
-//                    DatagramPacket recpacket = new DatagramPacket(recbuf,
-//                            recbuf.length);
-//                    try {
-//                        socket.receive(recpacket);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    System.out.println("Server: Message received: ‘"
-//                            + new String(recpacket.getData()) + "’\n");
-//                    System.out.println("Server: IP " + recpacket.getAddress()
-//                            + "’\n");
-//                }
+
             }
         }).start();
 
