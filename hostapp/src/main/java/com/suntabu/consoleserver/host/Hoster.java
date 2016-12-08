@@ -112,6 +112,7 @@ public class Hoster extends NanoHTTPD {
     public class PacketObj {
         String url;
         String name;
+        String app;
     }
 
 
