@@ -8,7 +8,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import fi.iki.elonen.NanoHTTPD;
@@ -22,7 +22,7 @@ public class Hoster extends NanoHTTPD {
     public static final Long SEND_INTERVAL = 2000L;
     static DatagramSocket socket = null;
 
-    private ArrayList<PacketObj> devices = new ArrayList<>();
+    private HashMap<String, PacketObj> devices = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
         try {
@@ -60,14 +60,14 @@ public class Hoster extends NanoHTTPD {
                             System.out.println("Server: Message received: ‘" + deviceInfo + "’\n");
 
 
-
-                            synchronized (host.devices){
-                                if (!host.devices.contains(deviceInfo) && deviceInfo.contains("http")) {
-                                    PacketObj po = new Gson().fromJson(deviceInfo,PacketObj.class);
-                                    host.devices.add(po);
+                            synchronized (host.devices) {
+                                if (deviceInfo.contains("http")) {
+                                    PacketObj po = new Gson().fromJson(deviceInfo, PacketObj.class);
+                                    if (!host.devices.containsKey(po.url)) {
+                                        host.devices.put(po.url, po);
+                                    }
                                 }
                             }
-
 
 
                             System.out.println("Server: IP " + recpacket.getAddress()
@@ -129,8 +129,8 @@ public class Hoster extends NanoHTTPD {
         if (devices.size() == 0) {
             msg += "<p>no devices</p>";
         } else {
-            for (PacketObj device : devices) {
-                msg += "<a href=\"" + device.url + "\" target=\"_blank\">" + device.name + "</a>";
+            for (Map.Entry<String, PacketObj> device : devices.entrySet()) {
+                msg += "<a href=\"" + device.getKey() + "\" target=\"_blank\">" + device.getValue().name + " : " + device.getValue().url + "</a></br>";
             }
 
         }
