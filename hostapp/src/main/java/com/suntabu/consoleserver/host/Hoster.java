@@ -60,7 +60,7 @@ public class Hoster extends NanoHTTPD {
                             }
 
                             String deviceInfo = new String(recpacket.getData(), 0, recpacket.getLength());
-                            System.out.println("Server: Message received: ‘" + deviceInfo + "’\n");
+                            System.out.println("Server: Message received: " + deviceInfo + "’\n");
 
 
                             synchronized (host.devices) {
@@ -175,11 +175,13 @@ public class Hoster extends NanoHTTPD {
         return newFixedLengthResponse(msg + "</body></html>\n");
     }
 
-    private static final String ASSET_BASE = "res/";
+    private static final String ASSET_BASE = "hostapp/src/res/";
 
     private InputStream loadAssets(String path) throws FileNotFoundException {
         File file = new File(path);
+        System.out.println(file.getAbsoluteFile());
         InputStream in = new FileInputStream(file);
+
         return in;
     }
 

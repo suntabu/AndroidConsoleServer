@@ -19,3 +19,23 @@ dependencies {
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+/*
+
+distZip {
+    into(project.name) {
+        from '.'
+        include 'res*/
+/*'
+    }
+}
+
+distTar {
+    into(project.name) {
+        from '.'
+        include 'res*/
+/*'
+    }
+}*/
+applicationDistribution.from("src/res") {
+    into "src/res"
+}
