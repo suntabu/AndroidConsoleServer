@@ -3,7 +3,11 @@ package com.suntabu.consoleserver.host;
 import com.google.gson.Gson;
 import com.suntabu.consoleserver.config.Config;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -11,6 +15,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -115,13 +121,47 @@ public class Hoster extends NanoHTTPD {
 
     public Hoster() throws IOException {
         super(Config.HTTP_PORT);
+        initPattern();
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
-        System.out.println("\nRunning! Point your browsers to http://localhost:"+Config.HTTP_PORT+"/ \n");
+        System.out.println("\nRunning! Point your browsers to http://localhost:" + Config.HTTP_PORT + "/ \n");
     }
 
 
     @Override
     public Response serve(IHTTPSession session) {
+        String uri = session.getUri();
+
+
+        if (uri.equalsIgnoreCase("/")) {
+            uri += "index.html";
+        }
+
+        Matcher matcher = pattern.matcher(uri);
+        if (matcher.find()) {
+            String key = matcher.group();
+            String[] strs = key.split("\\.");
+            if (strs.length >= 1) {
+                String mimeType = strs[strs.length - 1];
+                if (fileTypes.containsKey(mimeType)) {
+                    InputStream inputStream = null;
+                    try {
+                        inputStream = loadAssets(ASSET_BASE + key);
+
+                        return newFixedLengthResponse(Response.Status.OK, fileTypes.get(mimeType), inputStream, inputStream.available());
+                    } catch (FileNotFoundException e) {
+                        return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), e.getMessage());
+                    } catch (IOException e) {
+                        return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), e.getMessage());
+                    }
+                } else
+                    return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), "unsupported " + key);
+            } else {
+                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), "error for " + key);
+            }
+
+        }
+
+
         String msg = "<html><body><h1>Working Devices</h1>\n";
         Map<String, String> parms = session.getParms();
         if (devices.size() == 0) {
@@ -133,5 +173,38 @@ public class Hoster extends NanoHTTPD {
 
         }
         return newFixedLengthResponse(msg + "</body></html>\n");
+    }
+
+    private static final String ASSET_BASE = "res/";
+
+    private InputStream loadAssets(String path) throws FileNotFoundException {
+        File file = new File(path);
+        InputStream in = new FileInputStream(file);
+        return in;
+    }
+
+    private HashMap<String, String> fileTypes = new HashMap<>();
+    private Pattern pattern = null;
+
+    private void initPattern() {
+        fileTypes.put("js", "application/javascript");
+        fileTypes.put("json", "application/json");
+        fileTypes.put("jpg", "image/jpeg");
+        fileTypes.put("jpeg", "image/jpeg");
+        fileTypes.put("gif", "image/gif");
+        fileTypes.put("png", "image/png");
+        fileTypes.put("css", "text/css");
+        fileTypes.put("htm", "text/html");
+        fileTypes.put("html", "text/html");
+        fileTypes.put("ico", "image/x-icon");
+
+
+        String patternstr = "^/(.*\\.(";
+        for (Map.Entry<String, String> key : fileTypes.entrySet()) {
+            patternstr += key.getKey() + "|";
+        }
+        patternstr = patternstr.substring(0, patternstr.length() - 1) + "))$";
+
+        pattern = Pattern.compile(patternstr);
     }
 }
