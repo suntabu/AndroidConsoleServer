@@ -1,11 +1,19 @@
 package com.suntabu.consoleserver;
 
-import android.app.Activity;
-import android.app.Application;
 import android.content.res.Resources;
 
+import com.suntabu.ACS;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -25,16 +33,19 @@ public class ConsoleServer extends NanoHTTPD {
     private HashMap<String, String> fileTypes = new HashMap<>();
     private Pattern pattern = null;
     private Console console = new Console();
+    private int port = 0;
 
     public ConsoleServer(String hostname, int port) {
         super(hostname, port);
         initPattern();
+        this.port = port;
     }
 
     public ConsoleServer(int port) {
         super(port);
 
         initPattern();
+        this.port = port;
     }
 
     private void initPattern() {
@@ -121,4 +132,69 @@ public class ConsoleServer extends NanoHTTPD {
         }
     }
 
+    // UDP广播IP和PORT
+    public static final String SERVERIP = "255.255.255.255";
+    public static final int SERVERPORT = 11000;
+    public static final Long INTERVAL = 2000L;
+    DatagramSocket socket = null;
+
+    @Override
+    public void start() throws IOException {
+        super.start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // 向局域网UDP广播信息：Hello, World!
+                try {
+                    InetAddress serverAddress = InetAddress.getByName(SERVERIP);
+                    System.out.println("Client: Start connecting\n");
+                    socket = new DatagramSocket(SERVERPORT);
+                    while (true) {
+                        String url = ACS.getIpAccess() + port;
+                        JSONObject jo = new JSONObject();
+                        jo.put("url", url);
+                        jo.put("name", ACS.getPhoneName());
+
+
+                        byte[] buf = jo.toString().getBytes();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length,
+                                serverAddress, SERVERPORT);
+//                        System.out.println("Client: Sending ‘" + new String(buf)                                + "’\n");
+                        socket.send(packet);
+                        System.out.println("Client: sent Succeed!\n");
+
+                        Thread.sleep(INTERVAL);
+                    }
+
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                // 接收UDP广播，有的手机不支持
+//                while (true) {
+//                    byte[] recbuf = new byte[255];
+//                    DatagramPacket recpacket = new DatagramPacket(recbuf,
+//                            recbuf.length);
+//                    try {
+//                        socket.receive(recpacket);
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                    System.out.println("Server: Message received: ‘"
+//                            + new String(recpacket.getData()) + "’\n");
+//                    System.out.println("Server: IP " + recpacket.getAddress()
+//                            + "’\n");
+//                }
+            }
+        }).start();
+
+    }
 }

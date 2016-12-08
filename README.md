@@ -25,7 +25,7 @@ ACS.startAndroidWebServer();
 Then you can use open console web page at your phone's ip:port with any browsers you like.
 
 
-TIPS: your phone's ip must be reachable
+TIPS: your phone's ip must be reachable！
 ===
 
 LICENCE

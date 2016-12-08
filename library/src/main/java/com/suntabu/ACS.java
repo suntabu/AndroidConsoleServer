@@ -3,6 +3,7 @@ package com.suntabu;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import com.suntabu.consoleserver.ConsoleServer;
@@ -110,4 +111,16 @@ public class ACS {
     }
 
     public static HashMap<String, Method> methodMap = new HashMap<>();
+
+
+    public static String getIpAccess() {
+        WifiManager wifiManager = (WifiManager) context.getSystemService(context.WIFI_SERVICE);
+        int ipAddress = wifiManager.getConnectionInfo().getIpAddress();
+        final String formatedIpAddress = String.format("%d.%d.%d.%d", (ipAddress & 0xff), (ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
+        return "http://" + formatedIpAddress + ":";
+    }
+
+    public static String getPhoneName(){
+        return android.os.Build.MANUFACTURER;
+    }
 }
