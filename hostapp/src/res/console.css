@@ -1,16 +1,30 @@
-textarea {resize:none;}
+textarea {
+    resize: none;
+}
 
 body.console {
-  background-color:black;
+    background-color: black;
 }
+
 textarea.console {
-  width:100%;
-  background-color:#383838;
-  color:#F0F0F0;
-  font-size:14px;
-  font-family: Monaco, DejaVu Sans Mono, Bitstream Vera Sans Mono, Consolas, Courier New, monospace;
+    width: 100%;
+    background-color: #383838;
+    color: #F0F0F0;
+    font-size: 14px;
+    font-family: Monaco, DejaVu Sans Mono, Bitstream Vera Sans Mono, Consolas, Courier New, monospace;
 
 }
+
 #output {
-  height:500px;
+    height: 500px;
+}
+
+a.console {
+    font-size: 22px;
+    font-family: Monaco, DejaVu Sans Mono, Bitstream Vera Sans Mono, Consolas, Courier New, monospace;
+}
+
+p.console {
+    font-size: 34px;
+    font-family: Monaco, DejaVu Sans Mono, Bitstream Vera Sans Mono, Consolas, Courier New, monospace;
 }

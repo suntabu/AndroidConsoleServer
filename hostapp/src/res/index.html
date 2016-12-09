@@ -12,13 +12,36 @@
 
     <script>
 
+        function updatelist(){
+            $.get("fetch/devicelist", function (data, status) {
+                // Check if we are scrolled to the bottom to force scrolling on update
+                var output = $('#devicelist');
+                var list = JSON.parse(data);
+                output.empty();
+                for (var i = 0; i < list.length; i++){
+                    var device = list[i];
+                    output.append("<a href=\"" + device.url + "\" target=\"_blank\" class=\"console\">" + device.name + " : " + device.url + "</a></br>");
+                }
+                output.val(String(data));
+            });
+        }
+
+        // Poll to update the list
+        window.setInterval(function () {
+            updatelist(null)
+        }, 500);
 
     </script>
 
 </head>
 <body>
+    <p class="console">Working Devices</p>
+
+    <div id="devicelist">
 
 
+
+    </div>
 
 
 

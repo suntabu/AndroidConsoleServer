@@ -130,49 +130,44 @@ public class Hoster extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         String uri = session.getUri();
+        try {
 
+            if (uri.equalsIgnoreCase("/")) {
+                uri += "index.html";
+            }
 
-        if (uri.equalsIgnoreCase("/")) {
-            uri += "index.html";
-        }
+            Matcher matcher = pattern.matcher(uri);
+            if (matcher.find()) {
+                String key = matcher.group();
+                String[] strs = key.split("\\.");
+                if (strs.length >= 1) {
+                    String mimeType = strs[strs.length - 1];
+                    if (fileTypes.containsKey(mimeType)) {
+                        InputStream inputStream = null;
 
-        Matcher matcher = pattern.matcher(uri);
-        if (matcher.find()) {
-            String key = matcher.group();
-            String[] strs = key.split("\\.");
-            if (strs.length >= 1) {
-                String mimeType = strs[strs.length - 1];
-                if (fileTypes.containsKey(mimeType)) {
-                    InputStream inputStream = null;
-                    try {
                         inputStream = loadAssets(ASSET_BASE + key);
-
                         return newFixedLengthResponse(Response.Status.OK, fileTypes.get(mimeType), inputStream, inputStream.available());
-                    } catch (FileNotFoundException e) {
-                        return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), e.getMessage());
-                    } catch (IOException e) {
-                        return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), e.getMessage());
-                    }
-                } else
-                    return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), "unsupported " + key);
-            } else {
-                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), "error for " + key);
+
+                    } else
+                        return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), "unsupported " + key);
+                } else {
+                    return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), "error for " + key);
+                }
+
             }
 
-        }
-
-
-        String msg = "<html><body><h1>Working Devices</h1>\n";
-        Map<String, String> parms = session.getParms();
-        if (devices.size() == 0) {
-            msg += "<p>no devices</p>";
-        } else {
-            for (Map.Entry<String, PacketObj> device : devices.entrySet()) {
-                msg += "<a href=\"" + device.getKey() + "\" target=\"_blank\">" + device.getValue().name + " : " + device.getValue().url + "</a></br>";
+            uri = uri.toLowerCase();
+            if (uri.contains("fetch/devicelist")) {
+                return getDeviceList(session);
             }
+            String responseString = "";
+            return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), responseString);
 
+        } catch (FileNotFoundException e) {
+            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), e.getMessage());
+        } catch (IOException e) {
+            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, mimeTypes().get("md"), e.getMessage());
         }
-        return newFixedLengthResponse(msg + "</body></html>\n");
     }
 
     private static final String ASSET_BASE = "hostapp/src/res/";
@@ -208,5 +203,15 @@ public class Hoster extends NanoHTTPD {
         patternstr = patternstr.substring(0, patternstr.length() - 1) + "))$";
 
         pattern = Pattern.compile(patternstr);
+    }
+
+
+
+
+    private Response getDeviceList(IHTTPSession session){
+        synchronized (devices){
+            String json = new Gson().toJson(devices.values());
+            return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), json);
+        }
     }
 }
