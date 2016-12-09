@@ -67,7 +67,10 @@ public class Hoster extends NanoHTTPD {
                                 if (deviceInfo.contains("http")) {
                                     PacketObj po = new Gson().fromJson(deviceInfo, PacketObj.class);
                                     if (!host.devices.containsKey(po.url)) {
+                                        po.updateTime = System.currentTimeMillis();
                                         host.devices.put(po.url, po);
+                                    } else {
+                                        host.devices.get(po.url).updateTime = System.currentTimeMillis();
                                     }
                                 }
                             }
@@ -88,19 +91,24 @@ public class Hoster extends NanoHTTPD {
                 }
             }).start();
 
-
+            final long checkPeriod = Config.SEND_INTERVAL * 2;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (true) {
                         try {
-                            Thread.sleep(Config.SEND_INTERVAL * 2);
+                            Thread.sleep(checkPeriod);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
 
                         synchronized (host.devices) {
-                            host.devices.clear();
+                            for (Map.Entry<String, PacketObj> pair : host.devices.entrySet()) {
+                                if (System.currentTimeMillis() - pair.getValue().updateTime > checkPeriod) {
+                                    host.devices.remove(pair.getKey());
+                                }
+                            }
+
                         }
                     }
 
@@ -113,9 +121,19 @@ public class Hoster extends NanoHTTPD {
     }
 
     public class PacketObj {
-        String url;
-        String name;
-        String app;
+        public String url;
+        public String name;
+        public String app;
+
+        private long updateTime;
+
+        public long getUpdateTime() {
+            return updateTime;
+        }
+
+        public void setUpdateTime(long updateTime) {
+            this.updateTime = updateTime;
+        }
     }
 
 
@@ -175,6 +193,15 @@ public class Hoster extends NanoHTTPD {
     private InputStream loadAssets(String path) throws FileNotFoundException {
         File file = new File(path);
         System.out.println(file.getAbsoluteFile());
+
+/*        System.out.println(Thread.currentThread().getContextClassLoader().getResource(""));
+        System.out.println(Hoster.class.getClassLoader().getResource(""));
+        System.out.println(ClassLoader.getSystemResource(""));
+        System.out.println(Hoster.class.getResource(""));
+        System.out.println(Hoster.class.getResource("/"));//Class文件所在路径
+        System.out.println(new File("/").getAbsolutePath());
+        System.out.println(System.getProperty("user.dir"));*/
+
         InputStream in = new FileInputStream(file);
 
         return in;
@@ -206,10 +233,8 @@ public class Hoster extends NanoHTTPD {
     }
 
 
-
-
-    private Response getDeviceList(IHTTPSession session){
-        synchronized (devices){
+    private Response getDeviceList(IHTTPSession session) {
+        synchronized (devices) {
             String json = new Gson().toJson(devices.values());
             return newFixedLengthResponse(Response.Status.OK, mimeTypes().get("md"), json);
         }

@@ -37,5 +37,5 @@ distTar {
     }
 }*/
 applicationDistribution.from("src/res") {
-    into "bin/res"
+    into "bin/hostapp/src/res/"
 }
