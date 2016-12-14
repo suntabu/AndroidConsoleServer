@@ -156,7 +156,7 @@ public class ConsoleServer extends NanoHTTPD {
                 // 向局域网UDP广播信息：Hello, World!
                 try {
                     InetAddress serverAddress = InetAddress.getByName(Config.SERVERIP);
-                    System.out.println("Client: Start connecting\n");
+                    SunLog.Log("Client: Start connecting\n");
                     socket = getSocket(Config.SERVERPORT );
                     while (true) {
                         String url = ACS.getIpAccess() + port;
@@ -172,7 +172,6 @@ public class ConsoleServer extends NanoHTTPD {
                         System.out.println("Client: sent Succeed!\n");
 
                         Thread.sleep(Config.SEND_INTERVAL);
-                        SunLog.Log("Client: sent Succeed!\n");
                     }
 
                 } catch (UnknownHostException e) {

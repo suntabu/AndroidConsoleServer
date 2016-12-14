@@ -3,6 +3,18 @@
 buildscript {
     repositories {
         jcenter()
+
+        maven {
+            url LAN_MAVENCENTER
+        }
+
+        maven {
+            url LAN_QINXIANG
+        }
+
+        maven {
+            url LAN_JCENTER
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.3'
@@ -15,6 +27,18 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+
+        maven {
+            url LAN_MAVENCENTER
+        }
+
+        maven {
+            url LAN_QINXIANG
+        }
+
+        maven {
+            url LAN_JCENTER
+        }
     }
 }
 

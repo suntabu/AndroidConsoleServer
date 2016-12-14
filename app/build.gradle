@@ -28,5 +28,6 @@ dependencies {
 //    compile 'org.nanohttpd:nanohttpd:2.2.0'
     compile 'com.android.support:design:23.1.1'
 
-    compile project(":library")
+//    compile project(":library")
+    compile 'com.qinxiang.androidConsoleServer:AndroidConsoleServer:0.1.8'
 }
