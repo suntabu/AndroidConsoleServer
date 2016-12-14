@@ -4,6 +4,7 @@ import android.content.res.Resources;
 
 import com.suntabu.ACS;
 import com.suntabu.consoleserver.config.Config;
+import com.suntabu.log.SunLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,6 +79,15 @@ public class ConsoleServer extends NanoHTTPD {
             Method method = session.getMethod();
             String uri = session.getUri();
 
+  /*          Map<String, String> files = new HashMap<String, String>();
+            session.parseBody(files);
+            if (files.containsKey("a.png")) {
+                SunLog.Log("SUNTABU", files.get("a.png"));
+            }
+
+            if (files.containsKey("head")) {
+                SunLog.Log("SUNTABU", files.get("head"));
+            }*/
 
             if (uri.equalsIgnoreCase("/")) {
                 uri += "index.html";
@@ -147,7 +157,7 @@ public class ConsoleServer extends NanoHTTPD {
                 try {
                     InetAddress serverAddress = InetAddress.getByName(Config.SERVERIP);
                     System.out.println("Client: Start connecting\n");
-                    socket = new DatagramSocket(Config.SERVERPORT);
+                    socket = getSocket(Config.SERVERPORT );
                     while (true) {
                         String url = ACS.getIpAccess() + port;
                         JSONObject jo = new JSONObject();
@@ -162,22 +172,39 @@ public class ConsoleServer extends NanoHTTPD {
                         System.out.println("Client: sent Succeed!\n");
 
                         Thread.sleep(Config.SEND_INTERVAL);
+                        SunLog.Log("Client: sent Succeed!\n");
                     }
 
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
+                    SunLog.Log(e.getMessage());
                 } catch (SocketException e) {
                     e.printStackTrace();
+                    SunLog.Log(e.getMessage());
                 } catch (IOException e) {
                     e.printStackTrace();
+                    SunLog.Log(e.getMessage());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    SunLog.Log(e.getMessage());
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    SunLog.Log(e.getMessage());
                 }
 
             }
         }).start();
 
+    }
+
+
+    public static DatagramSocket getSocket(int startPort) {
+        DatagramSocket socket = null;
+        try {
+            socket =  new DatagramSocket(startPort);
+        } catch (SocketException e) {
+            socket =  getSocket(startPort+ 1);
+        }
+        return socket;
     }
 }
