@@ -38,9 +38,9 @@ public class LogModule {
 
     public void Log(String msg) {
 
-        String format = "[%s] : %s";
+        String format = "[%s][%s] : %s";
 
-        String content = String.format(format, new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()) , String.format(" %-40s", callMethodAndLine()) + msg);
+        String content = String.format(format, new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()) ,moduleName, String.format(" %-40s", callMethodAndLine()) + msg);
 
         ConsoleContent.append(content);
 
