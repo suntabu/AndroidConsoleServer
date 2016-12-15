@@ -169,7 +169,7 @@ public class ConsoleServer extends NanoHTTPD {
                         DatagramPacket packet = new DatagramPacket(buf, buf.length,
                                 serverAddress, Config.SERVERPORT);
                         socket.send(packet);
-                        System.out.println("Client: sent Succeed!\n");
+                        //System.out.println("Client: sent Succeed!\n");
 
                         Thread.sleep(Config.SEND_INTERVAL);
                     }
