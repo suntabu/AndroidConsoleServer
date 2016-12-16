@@ -145,6 +145,7 @@ public class ConsoleServer extends NanoHTTPD {
 
 
     DatagramSocket socket = null;
+    boolean isReporterRunning = true;
 
     @Override
     public void start() throws IOException {
@@ -157,8 +158,8 @@ public class ConsoleServer extends NanoHTTPD {
                 try {
                     InetAddress serverAddress = InetAddress.getByName(Config.SERVERIP);
                     SunLog.Log("Client: Start connecting\n");
-                    socket = getSocket(Config.SERVERPORT );
-                    while (true) {
+                    socket = getSocket(Config.SERVERPORT);
+                    while (isReporterRunning) {
                         String url = ACS.getIpAccess() + port;
                         JSONObject jo = new JSONObject();
                         jo.put("url", url);
@@ -172,6 +173,12 @@ public class ConsoleServer extends NanoHTTPD {
                         //System.out.println("Client: sent Succeed!\n");
 
                         Thread.sleep(Config.SEND_INTERVAL);
+                    }
+
+                    if (!isReporterRunning) {
+                        if (socket != null) {
+                            socket.close();
+                        }
                     }
 
                 } catch (UnknownHostException e) {
@@ -197,12 +204,21 @@ public class ConsoleServer extends NanoHTTPD {
     }
 
 
+    @Override
+    public void stop() {
+        super.stop();
+
+
+        isReporterRunning = false;
+    }
+
+
     public static DatagramSocket getSocket(int startPort) {
         DatagramSocket socket = null;
         try {
-            socket =  new DatagramSocket(startPort);
+            socket = new DatagramSocket(startPort);
         } catch (SocketException e) {
-            socket =  getSocket(startPort+ 1);
+            socket = getSocket(startPort + 1);
         }
         return socket;
     }
